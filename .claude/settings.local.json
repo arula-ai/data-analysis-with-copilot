@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:\\\\Users\\\\Asus\\\\.claude\\\\projects\\\\c--Users-Asus-Inrhythm-data-analyst-with-copilot\\\\memory\"\" 2>/dev/null || echo \"Memory directory does not exist \")",
+      "Bash(python3:*)",
+      "Bash(python -c \":*)",
+      "Bash(python -m json.tool \"c:/Users/Asus/Inrhythm/data-analyst-with-copilot/notebooks/starter_analysis.ipynb\")",
+      "WebFetch(domain:code.visualstudio.com)",
+      "Bash(git add -A)"
+    ]
+  }
+}

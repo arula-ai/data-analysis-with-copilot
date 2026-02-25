@@ -1,0 +1,39 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments
+.env
+.venv/
+venv/
+ENV/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup data files
+*.csv.bak
+*.csv.backup
+
+# Participant output files
+# These stay local so each participant's work doesn't conflict with others.
+# Only starter and reference files are committed to the repo.
+outputs/*.md
+outputs/*.ipynb
+scripts/*.py
+
+# Preserve structural files that should be committed
+!outputs/README.md
+!scripts/.gitkeep
+!exercises/
+!notebooks/starter_analysis.ipynb
