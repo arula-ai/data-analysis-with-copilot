@@ -1,9 +1,7 @@
 # GitHub Copilot for Data Analysis — Lab Action Guide
 
-**90-Minute Hands-On Lab | Blended Audience: Engineers & Analysts**
-**Dataset:** Hartwell Financial Services — Transaction Risk Alerts (Q4 2024)
-
-Follow these steps through each stage. After each stage, paste the hand-off prompt into Copilot Chat and save the response to `outputs/[stage]_handoff.md`.
+**90-Minute Hands-On Lab**
+**Workflow:** Risk Review → Data Profiling → Cleaning → Exploratory Analysis → Visualization → Audit → Executive Summary
 
 ---
 
