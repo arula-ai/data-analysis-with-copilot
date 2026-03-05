@@ -87,14 +87,6 @@ Type `#` in the Copilot Chat input and VS Code will show a file picker.
 
 **Files outside this repository** — do not attach external files containing real or sensitive data. If you need to analyze a file from outside this repo, copy only the relevant non-sensitive portion into a new file in `data/` first, then use `#filename` to attach it. Never paste raw data rows directly into a Copilot prompt.
 
-### VS Code Extensions
-
-Install these before starting if you haven't already:
-- **Rainbow CSV** (`mechatroner.rainbow-csv`) — colorizes CSV columns in the editor so you can visually inspect raw data without opening it in Excel
-- **Data Wrangler** (`ms-toolsai.datawrangler`) — interactive data preview panel for `.csv` and `.xlsx` files; use it to spot obvious anomalies before writing profiling code
-
-Install via Extensions panel (`Ctrl+Shift+X`), search by name.
-
 ### Pre-Lab Checklist
 
 - [ ] VS Code is open with Copilot Chat enabled — test with `Ctrl+Shift+I`
