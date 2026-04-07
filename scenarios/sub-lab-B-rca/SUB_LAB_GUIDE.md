@@ -63,6 +63,8 @@ scenarios/sub-lab-B-rca/
    Plain English only. Do not fix the code.
    ```
 
+   > **Why no slash command here?** The Pre-Step is a code review, not a data analysis workflow. Slash command prompt files (like `/data-profiling-analyst`) are designed for data operations — profiling, cleaning, EDA. For code review, type your prompt directly; no slash command exists for this step by design.
+
 4. **Review output for:**
    - [ ] Each BUG comment identified and explained
    - [ ] A predicted log_level per defect
@@ -175,82 +177,93 @@ scenarios/sub-lab-B-rca/
 
 ### Step 3 — Exploratory Analysis (10 min)
 
-> **How this works:** You are building a case, not generating a script. Read the output between each prompt and note your finding before moving on. At the end you will have 3 findings to validate against your Pre-Step hypothesis.
+> **How this works:** You are building a case, not generating a script. Read the output between each prompt and note your finding before moving on. At the end you will have 3 findings to close against your Pre-Step hypothesis.
 
 8. Select **Exploratory Data Analyst** from Agent dropdown
 
+   **Recommended:** type `/rca-analysis` and attach `#outputs/rca_app_logs_clean.csv` and `#data/rca_schema.md` — this runs all 3 EDA questions in sequence and writes the output file automatically.
+
+   Alternatively, run the prompts below one at a time, reading the output between each before continuing:
+
    > **Tip:** Always use the Agent dropdown first, then type your prompt.
 
-   **Prompt 1 — "Which service is failing most?"**
+   **Prompt 1 — "Which service is failing most, and is it across both environments?"**
 
-   > Get the failure rate per service first — not raw counts. notification-service has more total log rows than other services, so raw counts alone mislead. Rate = ERROR+FATAL count / total rows per service.
+   > Start with failure rate per service — not raw counts. notification-service has more total log rows than other services, so raw counts alone mislead. Then immediately split by environment — staging failures are a different incident from prod failures and should not be combined.
 
    ```
    Role: Platform Reliability Analyst preparing an RCA briefing for Engineering Operations.
    Input: #outputs/rca_app_logs_clean.csv
    Task: Using pandas, calculate and print:
-     1. Total rows per service_name
-     2. ERROR + FATAL count per service_name
-     3. Failure rate per service: (ERROR+FATAL count) / total rows, ordered rate descending
-        — show: service_name | total_rows | error_fatal_count | failure_rate_pct
+     1. Failure rate per service: (ERROR+FATAL count) / total rows per service
+        Show: service_name | total_rows | error_fatal_count | failure_rate_pct
+        Ordered by failure_rate_pct descending.
+     2. ERROR+FATAL count split by environment (prod vs staging) — one row per environment
+        Show: environment | total_rows | error_fatal_count | failure_rate_pct
    Constraints: Do not print user_id_masked.
-   Format: One labeled table, ordered by failure_rate_pct descending.
-   Checks: Confirm that rates are consistent with counts (e.g. a service with fewer rows
-   but more errors can have a higher rate than one with more rows but fewer errors).
+   Format: Two labeled tables.
    ```
 
-   **Read the output.** Which service has the highest failure rate? Note whether the top two services are within 5 percentage points of each other — that matters for your recommendation. Write down the rate and base-n before moving to Prompt 2.
+   **Read the output.** Which service has the highest failure rate? Does the environment split show prod and staging failing at similar rates, or is one environment driving the pattern? A higher failure rate in staging than prod suggests configuration or resource capacity differences — not a code-only problem.
 
-   > **Follow-up (if top two services are within 5%):** Ask Copilot: *"Filter outputs/rca_app_logs_clean.csv to prod environment only (182 rows). Recalculate failure rate per service for prod. Does the ranking change?"* — staging has a structurally higher failure rate than prod; if the ranking shifts when scoped to prod, the leading service is the environment-specific suspect.
+   **Prompt 2 — "Is response time correlated with failure, and which log_level is slowest?"**
 
-   **Prompt 2 — "When do failures spike?"**
-
-   > You know WHICH service leads. Now find WHEN failures concentrate — a 2–3 hour spike suggests a scheduled job, session expiry pattern, or batch load. This is the temporal signature of the root cause.
+   > The hypothesis from the code review predicted that resource exhaustion (DB pool, session TTL) would show up as elevated response times on failure rows. Test it directly by comparing response times across log levels — not just by service.
 
    ```
-   Role: Platform Reliability Analyst investigating failure timing patterns.
+   Role: Platform Reliability Analyst testing whether failure events are correlated with
+   higher response times.
    Input: #outputs/rca_app_logs_clean.csv
    Task: Using pandas:
-     1. Parse the timestamp column as datetime
-     2. Group ERROR + FATAL rows by hour of day (0–23)
-     3. Print: hour | error_fatal_count for all hours, ordered by count descending
-     4. State in one sentence: which 2–3 hours have the highest failure concentration
+     1. Average response_time_ms by log_level (INFO, WARN, ERROR, FATAL)
+        Exclude all null response_time_ms. Do NOT fill nulls with 0.
+        Show: log_level | avg_response_time_ms | row_count (with valid response times)
+        Ordered by avg_response_time_ms descending.
+     2. Average response_time_ms by service_name (exclude nulls)
+        Show: service_name | avg_response_time_ms, ordered descending
+     3. State in one sentence: are ERROR rows significantly slower than INFO rows on average?
    Constraints: Do not print user_id_masked.
-   Format: Table + one-sentence interpretation.
+   Format: Two tables + one-sentence interpretation.
    ```
 
-   **Read the output.** Is failure distributed evenly across the day, or concentrated in 2–3 hours? Concentrated timing narrows the root cause — check whether the spike hours align with any pattern you identified in `app_service.py` (e.g. session TTL expiry under load, retry storms, scheduled batch jobs).
+   **Read the output.** If ERROR rows have materially higher average response times than INFO rows: resource contention (DB pool exhaustion, session TTL under load) is the likely failure chain. If ERROR rows are NOT slower than INFO rows: the failures are logic-driven — exceptions swallowed silently, no retries, auth failures that terminate fast.
 
-   **Prompt 3 — "Does the hypothesis hold?"**
+   > **Hypothesis check:** Does the service with the highest failure rate (from Prompt 1) also have the highest average response time? If yes — supports resource exhaustion. If no — supports silent logic failure. Note whether this confirms or contradicts what you wrote in the Pre-Step.
 
-   > You formed a hypothesis in the Pre-Step. Now validate it. The key question: does the service with the highest failure rate also have the slowest average response time? If yes, resource contention (DB pool exhaustion, session TTL) is the likely chain. If no, the failure is logic-driven (exception swallowing, no retries) — fast failures, not slow ones.
+   **Prompt 3 — "Which error codes are driving failures — and do they map to the BUGs in the code?"**
+
+   > This is the hypothesis closure step. The Pre-Step identified specific defect signatures (ERR_001 from AuthService session expiry, ERR_DB_001 from TransactionProcessor pool exhaustion). Now check whether those codes appear most in the actual log data — closing the loop from code review to evidence.
 
    ```
-   Role: Platform Reliability Analyst comparing failure patterns against code defects.
+   Role: Platform Reliability Analyst closing the loop between code defects and log evidence.
    Input: #outputs/rca_app_logs_clean.csv
-   Task: Using pandas:
-     1. Calculate average response_time_ms by service_name (exclude all nulls)
-     2. Print: service_name | avg_response_time_ms, ordered descending
-     3. State in one sentence: does the service with the highest failure rate (from Prompt 1)
-        also have the highest average response time?
-     4. State in one sentence: does this confirm or contradict your Pre-Step hypothesis?
-   Constraints: Do not print user_id_masked. Nulls excluded — do not fill with 0.
-   Format: Table + two-sentence interpretation.
+   Task: Using pandas, filter to ERROR + FATAL rows only, then:
+     1. Count value_counts of error_code (include NaN separately as "null — missing diagnostic")
+        Show: error_code | count | pct_of_error_fatal_rows, ordered by count descending
+     2. For the top 2 most frequent error codes: show which service_name rows have that code
+        (service_name | count) — one sub-table per top error code
+     3. State in one sentence: do the most frequent error codes match the failure modes
+        predicted by the BUGs in app_service.py?
+   Constraints: Do not print user_id_masked.
+   Format: One main table + two sub-tables + one-sentence interpretation.
+   Note: error_code is null for 12 ERROR/FATAL rows — this is a data gap, not expected behavior.
    ```
 
-   **Read the output.** If the highest-failure service also has the highest response time: the evidence points to resource exhaustion — DB pool size 3 or session TTL 30s under concurrent load. If the highest-failure service has *normal* response times: the evidence points to logic failure — exceptions swallowed silently, no retries, no fallback queue.
+   **Read the output.** ERR_001 maps to `AuthService` session expiry (SESSION_TTL = 30s, no caching). ERR_DB_001 maps to `TransactionProcessor` pool exhaustion (DB_POOL_SIZE = 3, no fallback). If these two codes dominate the error distribution — the code review hypothesis is confirmed by the data. Note which BUG in `app_service.py` each top error code traces back to.
 
 9. **Review output for:**
    - [ ] Service failure rate table printed (rate as %, ordered descending, with base-n per service)
-   - [ ] Hourly failure table printed; top 2–3 hours named
-   - [ ] Cross-service avg response_time_ms table printed (nulls excluded, not filled with 0)
-   - [ ] Hypothesis explicitly stated as confirmed or contradicted based on EDA output
+   - [ ] Environment split table printed (prod vs staging failure rate)
+   - [ ] Response time by log_level table printed (nulls excluded, not filled with 0)
+   - [ ] Cross-service avg response_time_ms table printed
+   - [ ] Error code frequency table printed (ERROR/FATAL rows only, nulls counted separately)
+   - [ ] Hypothesis closure sentence states confirmed or contradicted with evidence
    - [ ] `user_id_masked` absent from all printed output
 
-10. **Document your findings** in `outputs/B_cleaning_decisions.md` as 2–3 plain-English briefing bullets — which service leads and at what rate, when failures cluster, and whether the code review hypothesis was confirmed. Write them as if briefing the Engineering Operations lead right now.
+10. **Document your findings** in `outputs/B_cleaning_decisions.md` as 2–3 plain-English briefing bullets — which service leads and at what rate, whether response time implicates resource exhaustion, and which error codes confirm or contradict the code review hypothesis. Write them as if briefing the Engineering Operations lead right now.
 
 **Bonus (if time permits):**
-- Ask Copilot: *"Compare ERROR+FATAL rate between prod (182 rows) and staging (118 rows) environments. Is the failure rate higher in prod or staging — and what does that suggest about whether the root cause is code-driven or configuration-driven?"* — Staging has a structurally higher failure rate than prod in this dataset; this is a significant finding that the raw service-level view hides.
+- Ask Copilot: *"For ERR_001 rows (AuthService session expiry): what is the average response_time_ms compared to ERR_DB_001 rows (DB pool exhaustion)? Which defect is producing the slower failures?"* — This distinguishes between an auth bottleneck and a DB bottleneck, which have different remediation paths.
 - Ask Copilot to generate `scripts/analyze_logs.py` that runs all three analyses in sequence with labeled output — a reproducible record of the exact numbers that informed your Phase 3 charts.
 
 11. **Save your findings** — use this prompt to write structured output to the file:
@@ -270,13 +283,13 @@ scenarios/sub-lab-B-rca/
     ```
 
 12. **Review output for:**
-    - [ ] **Section 1: Data Cleaning Audit Log** present with row reconciliation table
-    - [ ] Table shows **Raw Data** count vs. **Final Dataset** count with all exclusion steps
-    - [ ] **Section 2: Evidence-Based Findings** present with numbered entries
-    - [ ] Each finding follows: **Question | Methodology | Finding | Evidence | Assumptions**
-    - [ ] Counts consistent with profiling results
+    - [ ] Row reconciliation table present: Raw count → after dedup → final count (with exact numbers)
+    - [ ] Every cleaning transformation listed with written business justification
+    - [ ] Service failure rate table present with rate %, base-n, and ordered descending
+    - [ ] Environment split table present (prod vs staging failure rate)
+    - [ ] Error code frequency table present (filtered to ERROR/FATAL rows only)
+    - [ ] Hypothesis closure sentence: confirmed or contradicted, with evidence cited
     - [ ] No `user_id_masked` in any output
-    - [ ] Hypothesis stated as confirmed or contradicted with evidence
 
 ---
 
@@ -294,40 +307,57 @@ scenarios/sub-lab-B-rca/
 
    **Or use this custom prompt:**
    ```
-   Using outputs/rca_app_logs_clean.csv, generate scripts/visualize_logs.py with
-   3 interactive charts using plotly.express:
-   1. ERROR + FATAL count by service_name (horizontal bar chart, ordered by count descending)
-   2. Average response_time_ms by service_name (horizontal bar chart, ordered by avg response
-      time descending, exclude null response_time_ms — do NOT fill nulls with 0)
-   3. ERROR and FATAL log count over time by hour of day (bar chart — parse timestamp first,
-      group by hour 0-23, ordered by hour ascending)
-   Rules: Y-axis starts at 0. No 3D charts. No user_id_masked in any label, axis, or hover.
-   All axes labeled with units. All charts titled.
-   Combine all 3 charts into a single dashboard file:
-     chart1_html = fig1.to_html(include_plotlyjs=True,  full_html=False)
-     chart2_html = fig2.to_html(include_plotlyjs=False, full_html=False)
-     chart3_html = fig3.to_html(include_plotlyjs=False, full_html=False)
-     summary = f'<h2>RCA Analysis Dashboard</h2><p><strong>Dataset:</strong> {n_rows} rows after cleaning | <strong>Period:</strong> [date range from data]</p><p><strong>Key Finding:</strong> [one-sentence headline from EDA]</p><hr/>'
-     html = f'<html><head><meta charset="utf-8"></head><body>{summary}{chart1_html}{chart2_html}{chart3_html}</body></html>'
-     with open('outputs/B_dashboard.html', 'w', encoding='utf-8') as f: f.write(html)
-   Include a comment block evaluating each chart for the business.
+   Using outputs/rca_app_logs_clean.csv (pd.read_csv), generate
+   scripts/visualize_logs.py with 3 interactive Plotly charts.
+   Drop user_id_masked immediately on load.
+
+   Chart 1 — Horizontal bar: ERROR + FATAL count by service_name
+     - Ordered by count descending
+     - Label each bar with its count
+     - X-axis: "Number of ERROR + FATAL Events". Y-axis: service names. Title the chart.
+
+   Chart 2 — Grouped bar: Average response_time_ms by log_level
+     - Filter to rows where response_time_ms is NOT null. Do NOT fill nulls with 0.
+     - Calculate mean response_time_ms for each log_level (INFO, WARN, ERROR, FATAL)
+     - Show one bar per log_level, ordered by severity (INFO, WARN, ERROR, FATAL)
+     - Label each bar with the average value (e.g. "842ms")
+     - X-axis: "Log Level". Y-axis: "Average Response Time (ms)". Y-axis from 0. Title the chart.
+     - Include a comment: "This chart tests whether ERROR/FATAL rows have higher response
+       times than INFO rows — confirming or disproving the resource-exhaustion hypothesis."
+
+   Chart 3 — Bar: ERROR + FATAL count by hour (chronological timeline)
+     - Parse timestamp column as datetime
+     - Group ERROR + FATAL rows by hour — use the actual datetime hour (e.g. 2024-11-01 08:00,
+       2024-11-01 09:00, ...) not aggregated hour-of-day
+     - X-axis: datetime hour (show as "YYYY-MM-DD HH:MM"). X-axis labels at 45°.
+     - Y-axis: "Number of ERROR + FATAL Events". Y-axis from 0. Title the chart.
+
+   Combine all 3 into outputs/B_dashboard.html (single self-contained file,
+   include_plotlyjs=True on Chart 1 only). Add a summary header with row count,
+   date range from data, and a one-sentence key finding from the EDA.
+   Include a comment block per chart evaluating the business insight.
    Write the script to scripts/visualize_logs.py and run it.
    ```
 
-3. **Open the dashboard in your browser:**
+3. **Save the generated script** before running: hover over the code block in Copilot Chat → click **Insert into New File** → save as `scripts/visualize_logs.py`. Alternatively, copy the code → `Ctrl+N` → paste → `Ctrl+S` → name it.
+
+4. **Open the dashboard in your browser:**
    ```
-   start outputs\B_dashboard.html
+   start outputs\B_dashboard.html        ← Windows
+   open outputs/B_dashboard.html         ← Mac
    ```
 
-4. **Confirm the script ran** and review the dashboard:
+5. **Confirm the script ran** and review the dashboard:
    - [ ] Dashboard opens in browser showing all 3 charts with the summary header
    - [ ] Summary header shows correct row count, date range, and a key finding sentence
-   - [ ] All 3 charts have descriptive titles
-   - [ ] All axes labeled with units (e.g., "Number of Errors", "Response Time (ms)", "Hour of Day")
-   - [ ] Y-axis starts at 0 (`rangemode='tozero'`)
+   - [ ] Chart 1 (horizontal bar): bars ordered by count descending, each labelled
+   - [ ] Chart 2 (grouped bar): one bar per log_level ordered INFO→FATAL, avg response time labelled; ERROR bars visibly higher than INFO if resource exhaustion is present
+   - [ ] Chart 3 (bar): chronological timeline — x-axis shows actual datetime hours in order, not hour-of-day aggregated
+   - [ ] All 3 charts have descriptive titles and labeled axes with units
+   - [ ] Y-axes start at 0 on all charts
    - [ ] `user_id_masked` not visible in labels, axis values, or hover tooltips
 
-5. **Sharing the dashboard**
+6. **Sharing the dashboard**
 
    | Format | How | When to Use |
    |--------|-----|-------------|

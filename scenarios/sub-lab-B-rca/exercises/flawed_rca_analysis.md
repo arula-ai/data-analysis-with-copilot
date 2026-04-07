@@ -43,7 +43,7 @@ These results confirm that **slow response times cause service errors** and that
 
 The log dataset was cleaned prior to analysis. Null values were handled and duplicate entries were addressed using standard cleaning procedures.
 
-<!-- FLAW 3: Logical contradiction. The rca_schema.md Known Issues section documents 15 duplicate request_ids. If duplicates were removed during cleaning, at most 285 rows could remain — not 300. The statement that all 300 log entries were retained is impossible if any deduplication occurred. The correct analysis documents the exact number of rows removed and updates the total count accordingly. -->
+<!-- FLAW 3: Logical contradiction. The rca_schema.md Known Issues section documents 8 duplicate request_ids. If duplicates were removed during cleaning, at most 292 rows could remain — not 300. The statement that all 300 log entries were retained is impossible if any deduplication occurred. The correct analysis documents the exact number of rows removed and updates the total count accordingly. -->
 
 After cleaning, **all 300 log entries were retained with no data loss**. The cleaned dataset contains the complete record of platform activity during the incident window.
 
