@@ -65,7 +65,7 @@ Walk through `reference/responsible_use.md`. Key points to emphasize:
 1. Discuss the business questions using Copilot.
 2. Run the imports cell and data load cell — show the dataset is real and loads correctly
 3. Select **Data Profiling Analyst** from the Agent Selector Dropdown
-4. Enter a profiling prompt live using `/data-profiling-analyst` + `#filename`
+4. Enter a profiling prompt live using `/data-profiling` + `#filename`
 5. Show how to evaluate the output: run the code, check the actual numbers vs. Copilot's claims
 6. Show one follow-up prompt asking Copilot to identify issues
 7. Point to the matching SUB_LAB_GUIDE.md stage — "this is what you'll do for 50 minutes"

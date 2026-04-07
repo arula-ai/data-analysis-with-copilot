@@ -105,12 +105,12 @@ Type `/` in Copilot Chat to see all available slash commands. All 6 prompt files
 
 | Slash Command | Agent Mode | What It Does |
 |---|---|---|
-| `/data-profiling-analyst` | Data Profiling Analyst | Generates profiling code and a numbered data quality issue log; outputs `[X]_profile.md` |
-| `/data-cleaning-engineer` | Data Cleaning Engineer | Generates a cleaning script with inline justifications and before/after row counts; outputs `[X]_cleaning_decisions.md` |
-| `/exploratory-data-analyst` | Exploratory Data Analyst | Generates hypothesis-driven EDA code with plain-English findings using pandas groupby and aggregation |
-| `/visualization-architect` | Visualization Architect | Generates labeled, policy-compliant chart code using plotly.express; outputs `[X]_chart_*.html` |
-| `/data-risk-reviewer` | Data Risk Reviewer | Classifies every column by sensitivity tier (Public/Internal/Confidential/Restricted); flags PII-adjacent fields with handling recommendations |
-| `/responsible-use-auditor` | Responsible Use Auditor | Reviews all generated scripts and outputs for policy compliance; produces risk findings table and auditor sign-off |
+| `/data-profiling` | Data Profiling Analyst | Generates profiling code and a numbered data quality issue log; outputs `[X]_profile.md` |
+| `/data-cleaning` | Data Cleaning Engineer | Generates a cleaning script with inline justifications and before/after row counts; outputs `[X]_cleaning_decisions.md` |
+| `/exploratory-analysis` | Exploratory Data Analyst | Generates hypothesis-driven EDA code with plain-English findings using pandas groupby and aggregation |
+| `/data-visualization` | Visualization Architect | Generates labeled, policy-compliant chart code using plotly.express; outputs `[X]_chart_*.html` |
+| `/data-risk-review` | Data Risk Reviewer | Classifies every column by sensitivity tier (Public/Internal/Confidential/Restricted); flags PII-adjacent fields with handling recommendations |
+| `/responsible-use-audit` | Responsible Use Auditor | Reviews all generated scripts and outputs for policy compliance; produces risk findings table and auditor sign-off |
 
 **VS Code Extension Quick Commands:**
 

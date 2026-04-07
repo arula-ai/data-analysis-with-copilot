@@ -75,7 +75,7 @@ scenarios/sub-lab-C-modernization/
 ## Phase 1 — Data Ingestion & Quality Assessment (10 min)
 
 **Agent:** Data Profiling Analyst
-**Prompt file:** `/data-profiling-analyst`
+**Prompt file:** `/data-profiling`
 
 > **Before prompting:** Read `data/mainframe_schema.md` — the Known Issues section documents sentinel values and invalid entries.
 
@@ -84,7 +84,7 @@ scenarios/sub-lab-C-modernization/
 1. Select **Data Profiling Analyst** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling-analyst` and attach `#data/mainframe_usage.xlsx` and `#data/mainframe_schema.md`
+   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling` and attach `#data/mainframe_usage.xlsx` and `#data/mainframe_schema.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -117,7 +117,7 @@ scenarios/sub-lab-C-modernization/
 ## Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis (25 min)
 
 **Agent:** Data Cleaning Engineer
-**Prompt file:** `/data-cleaning-engineer`
+**Prompt file:** `/data-cleaning`
 
 ### Step 1 — Critique the Flawed Analysis (5 min)
 
@@ -225,12 +225,12 @@ scenarios/sub-lab-C-modernization/
 ## Phase 3 — Insight Visualization & Reporting (15 min)
 
 **Agent:** Visualization Architect
-**Prompt file:** `/visualization-architect`
+**Prompt file:** `/data-visualization`
 
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/visualization-architect` and attach `#data/mainframe_usage_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#data/mainframe_usage_clean.csv`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 

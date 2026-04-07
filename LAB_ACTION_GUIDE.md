@@ -64,15 +64,15 @@ The lab artifacts reflect this enterprise reality: All phases generate productio
 
 | Scenario | Phase | Agent | Prompt | Core Artifact |
 |---|---|---|---|---|
-| **A — Treasury Anomaly Detection** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling-analyst` | `outputs/A_profile.md` |
-| | Phase 2 — Data Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning-engineer` | `scripts/clean_treasury.py` |
-| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/visualization-architect` | `scripts/visualize_treasury.py` |
-| **B — Root Cause Analysis** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling-analyst` | `outputs/B_profile.md` |
-| | Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning-engineer` | `scripts/clean_logs.py` |
-| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/visualization-architect` | `scripts/visualize_logs.py` |
-| **C — Product Modernization** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling-analyst` | `outputs/C_profile.md` |
-| | Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning-engineer` | `scripts/clean_mainframe.py` |
-| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/visualization-architect` | `scripts/visualize_mainframe.py` |
+| **A — Treasury Anomaly Detection** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling` | `outputs/A_profile.md` |
+| | Phase 2 — Data Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning` | `scripts/clean_treasury.py` |
+| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/data-visualization` | `scripts/visualize_treasury.py` |
+| **B — Root Cause Analysis** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling` | `outputs/B_profile.md` |
+| | Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning` | `scripts/clean_logs.py` |
+| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/data-visualization` | `scripts/visualize_logs.py` |
+| **C — Product Modernization** | Phase 1 — Data Ingestion & Quality Assessment | Data Profiling Analyst | `/data-profiling` | `outputs/C_profile.md` |
+| | Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis | Data Cleaning Engineer → Exploratory Data Analyst | `/data-cleaning` | `scripts/clean_mainframe.py` |
+| | Phase 3 — Insight Visualization & Reporting | Visualization Architect | `/data-visualization` | `scripts/visualize_mainframe.py` |
 
 ---
 
@@ -102,12 +102,12 @@ Type `/` in Copilot Chat to see all available slash commands:
 
 | Slash Command | Agent | Purpose |
 |---|---|---|
-| `/data-profiling-analyst` | Data Profiling Analyst | Profile dataset, flag all quality issues with counts and percentages |
-| `/data-cleaning-engineer` | Data Cleaning Engineer | Generate cleaning script with inline justification comments |
-| `/exploratory-data-analyst` | Exploratory Data Analyst | Answer specific business questions with pandas |
-| `/visualization-architect` | Visualization Architect | Build 3 labeled interactive charts and export as HTML |
-| `/data-risk-reviewer` | Data Risk Reviewer | Classify every column by sensitivity tier, flag PII-adjacent fields |
-| `/responsible-use-auditor` | Responsible Use Auditor | Audit all scripts and outputs for policy compliance |
+| `/data-profiling` | Data Profiling Analyst | Profile dataset, flag all quality issues with counts and percentages |
+| `/data-cleaning` | Data Cleaning Engineer | Generate cleaning script with inline justification comments |
+| `/exploratory-analysis` | Exploratory Data Analyst | Answer specific business questions with pandas |
+| `/data-visualization` | Visualization Architect | Build 3 labeled interactive charts and export as HTML |
+| `/data-risk-review` | Data Risk Reviewer | Classify every column by sensitivity tier, flag PII-adjacent fields |
+| `/responsible-use-audit` | Responsible Use Auditor | Audit all scripts and outputs for policy compliance |
 | `/eda-analysis` | Exploratory Data Analyst | Run all Phase 2B treasury EDA analyses in one shot and write briefing bullets to `outputs/A_cleaning_decisions.md` |
 
 > **Attaching files:** Use `#filename` syntax in your prompt to attach any file from your workspace. Always attach both the dataset and the schema — Copilot uses the schema to understand column definitions and generate more accurate code.

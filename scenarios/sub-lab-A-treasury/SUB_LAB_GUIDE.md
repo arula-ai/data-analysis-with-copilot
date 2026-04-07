@@ -46,7 +46,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 ## Phase 1 — Data Ingestion & Quality Assessment (10 min)
 
 **Agent:** Data Profiling Analyst
-**Prompt file:** `/data-profiling-analyst`
+**Prompt file:** `/data-profiling`
 
 > **Before prompting:** Read `data/treasury_schema.md` — specifically the Known Issues section. Sentinel values (`999` in `prior_alerts_90d`, `-1` in `analyst_confidence`), invalid flag values (`anomaly_confirmed = 2`), and `counterparty_masked` are all documented there.
 
@@ -55,7 +55,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 1. Open Copilot Chat → select **Data Profiling Analyst** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling-analyst` and attach `#data/treasury_payments.xlsx` and `#data/treasury_schema.md`
+   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling` and attach `#data/treasury_payments.xlsx` and `#data/treasury_schema.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -91,12 +91,12 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 ### Part A — Data Cleaning (10 min)
 
 **Agent:** Data Cleaning Engineer
-**Prompt file:** `/data-cleaning-engineer`
+**Prompt file:** `/data-cleaning`
 
 1. Select **Data Cleaning Engineer** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Data Cleaning Engineer** from the Agent dropdown, then type `/data-cleaning-engineer` and attach `#data/treasury_payments.xlsx` and `#outputs/A_profile.md`
+   Select **Data Cleaning Engineer** from the Agent dropdown, then type `/data-cleaning` and attach `#data/treasury_payments.xlsx` and `#outputs/A_profile.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -234,12 +234,12 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 ## Phase 3 — Insight Visualization & Reporting (15 min)
 
 **Agent:** Visualization Architect
-**Prompt file:** `/visualization-architect`
+**Prompt file:** `/data-visualization`
 
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/visualization-architect` and attach `#outputs/treasury_payments_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#outputs/treasury_payments_clean.csv`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 

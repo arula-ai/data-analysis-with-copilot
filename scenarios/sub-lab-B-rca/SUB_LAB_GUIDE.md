@@ -47,7 +47,7 @@ scenarios/sub-lab-B-rca/
 ## Pre-Step — Codebase Review (5 min)
 
 **Agent:** Exploratory Data Analyst
-**Prompt file:** `/code-review-analyst`
+**Prompt file:** `/code-review`
 
 > Code tells you what *can* go wrong. Logs tell you what *did* go wrong. Read the code first — form a hypothesis, then validate it with data.
 
@@ -55,7 +55,7 @@ scenarios/sub-lab-B-rca/
 
 2. Select **Exploratory Data Analyst** from Agent dropdown
 
-3. Type `/code-review-analyst` and attach `#data/app_service.py` and `#data/rca_schema.md`
+3. Type `/code-review` and attach `#data/app_service.py` and `#data/rca_schema.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -73,7 +73,7 @@ scenarios/sub-lab-B-rca/
 ## Phase 1 — Data Ingestion & Quality Assessment (10 min)
 
 **Agent:** Data Profiling Analyst
-**Prompt file:** `/data-profiling-analyst`
+**Prompt file:** `/data-profiling`
 
 > **Before prompting:** Read `data/rca_schema.md` — the Known Issues section documents duplicates, expected nulls on FATAL rows, and invalid message fields.
 
@@ -82,7 +82,7 @@ scenarios/sub-lab-B-rca/
 1. Select **Data Profiling Analyst** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling-analyst` and attach `#data/rca_app_logs.csv` and `#data/rca_schema.md`
+   Select **Data Profiling Analyst** from the Agent dropdown, then type `/data-profiling` and attach `#data/rca_app_logs.csv` and `#data/rca_schema.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -117,7 +117,7 @@ scenarios/sub-lab-B-rca/
 ## Phase 2 — Analysis Critique, Cleaning & Exploratory Analysis (25 min)
 
 **Agent:** Data Cleaning Engineer
-**Prompt file:** `/data-cleaning-engineer`
+**Prompt file:** `/data-cleaning`
 
 ### Step 1 — Critique the Flawed Analysis (5 min)
 
@@ -292,12 +292,12 @@ scenarios/sub-lab-B-rca/
 ## Phase 3 — Insight Visualization & Reporting (15 min)
 
 **Agent:** Visualization Architect
-**Prompt file:** `/visualization-architect`
+**Prompt file:** `/data-visualization`
 
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/visualization-architect` and attach `#outputs/rca_app_logs_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#outputs/rca_app_logs_clean.csv`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
