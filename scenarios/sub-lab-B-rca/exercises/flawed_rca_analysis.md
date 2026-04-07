@@ -23,7 +23,7 @@ This report summarizes findings from the Q4 2024 log analysis for the payments p
 
 Log analysis confirmed that NotificationService generated the most failures during the incident window. Its ERROR + FATAL rate as a percentage of its own total log entries was 61%, significantly higher than any other service.
 
-<!-- FLAW 1: Wrong service blamed without evidence. The rca_schema.md Known Issues section documents that 15 duplicate request_ids exist in the dataset. If duplicates were not removed before calculating per-service rates, the counts are inflated and the ranking is unreliable. A correct analysis removes duplicates first, then calculates rates. -->
+<!-- FLAW 1: Wrong service blamed without evidence. The rca_schema.md Known Issues section documents that 8 duplicate request_ids exist in the dataset. If duplicates were not removed before calculating per-service rates, the counts are inflated and the ranking is unreliable. A correct analysis removes duplicates first, then calculates rates. -->
 
 Based on this finding, we conclude that **NotificationService directly caused all payment transaction failures** observed during the incident window.
 

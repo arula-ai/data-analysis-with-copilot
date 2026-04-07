@@ -92,7 +92,8 @@ scenarios/sub-lab-B-rca/
    ```
    Profile data/rca_app_logs.csv using pandas only.
    Print: total row count, log_level distribution (value_counts), ERROR and FATAL count
-   by service_name, null count per column, duplicate request_id count.
+   by service_name, null count per column, duplicate request_id count,
+   count of null or empty message values on ERROR and FATAL rows separately.
    Flag any service with more than 5 FATAL log entries.
    Flag columns where null % > 5%.
    Do not modify the dataframe. Do not print user_id_masked values.
@@ -107,6 +108,7 @@ scenarios/sub-lab-B-rca/
    - [ ] Null counts documented for all columns
    - [ ] Duplicate `request_id` count documented
    - [ ] Mixed timestamp formats flagged
+   - [ ] Null/empty `message` count on ERROR rows documented separately from FATAL rows
    - [ ] `user_id_masked` noted as PII-adjacent
    - [ ] Output saved to `outputs/B_profile.md`
 
@@ -146,7 +148,7 @@ scenarios/sub-lab-B-rca/
    Now generate scripts/clean_logs.py that correctly cleans data/rca_app_logs.csv,
    avoiding all the flaws identified above. Every transformation must have an inline
    comment explaining the business justification. Print row count before cleaning,
-   after each major step, and at the end. Save cleaned data to data/rca_app_logs_clean.csv.
+   after each major step, and at the end. Save cleaned data to outputs/rca_app_logs_clean.csv.
    Do not overwrite the original. pandas only. Do not print user_id_masked values.
    Write the script to scripts/clean_logs.py and run it.
    ```
@@ -155,7 +157,8 @@ scenarios/sub-lab-B-rca/
    - Duplicate `request_id` rows removed with justification
    - Mixed timestamp formats resolved using `pd.to_datetime(errors='coerce')`
    - Null `response_time_ms` on FATAL rows retained — schema says these are expected nulls
-   - Null `response_time_ms` on ERROR rows documented — not silently dropped
+   - Null `response_time_ms` on ERROR rows documented separately — not silently dropped
+   - Null/empty `message` on ERROR/FATAL rows retained — they still represent failure events; noted as data gaps
    - `user_id_masked` never printed in row-level output
 
 6. **Confirm the script ran** and review output for:
@@ -163,32 +166,92 @@ scenarios/sub-lab-B-rca/
    - [ ] Row count documented before AND after cleaning
    - [ ] Duplicate removal documented with count
    - [ ] Null `response_time_ms` on FATAL rows retained with comment
+   - [ ] Null/empty `message` on ERROR/FATAL rows retained with comment
    - [ ] `user_id_masked` never printed
 
-7. Save to: `outputs/B_cleaning_decisions.md`
-   *(Use template: `templates/cleaning_decisions_template.md`)*
+7. Cleaning justifications are documented as inline comments inside `scripts/clean_logs.py` — no separate file is needed yet. Your EDA findings (the structured analysis record) go into `outputs/B_cleaning_decisions.md` at the end of Step 11 after all analysis is complete.
 
 > **SQL Reference (Optional — Module 3):** See `scenarios/sub-lab-B-rca/exercises/sql_cleaning_reference.sql` for equivalent SQL cleaning logic. SQL is not required — Python is the deliverable.
 
-### Step 3 — Exploratory Analysis (5 min)
+### Step 3 — Exploratory Analysis (10 min)
 
-9. **Custom prompt:**
+> **How this works:** You are building a case, not generating a script. Read the output between each prompt and note your finding before moving on. At the end you will have 3 findings to validate against your Pre-Step hypothesis.
+
+8. Select **Exploratory Data Analyst** from Agent dropdown
+
+   > **Tip:** Always use the Agent dropdown first, then type your prompt.
+
+   **Prompt 1 — "Which service is failing most?"**
+
+   > Get the failure rate per service first — not raw counts. notification-service has more total log rows than other services, so raw counts alone mislead. Rate = ERROR+FATAL count / total rows per service.
+
    ```
-   Using data/rca_app_logs_clean.csv, generate a Python pandas script (scripts/analyze_logs.py):
-   - Count of rows grouped by service_name and log_level, ordered by service_name
-   - Average response_time_ms by service_name (exclude nulls)
-   - All ERROR and FATAL rows for the service with the highest failure rate
-   Do not include user_id_masked in any output.
-   Write the script to scripts/analyze_logs.py and run it.
+   Role: Platform Reliability Analyst preparing an RCA briefing for Engineering Operations.
+   Input: #outputs/rca_app_logs_clean.csv
+   Task: Using pandas, calculate and print:
+     1. Total rows per service_name
+     2. ERROR + FATAL count per service_name
+     3. Failure rate per service: (ERROR+FATAL count) / total rows, ordered rate descending
+        — show: service_name | total_rows | error_fatal_count | failure_rate_pct
+   Constraints: Do not print user_id_masked.
+   Format: One labeled table, ordered by failure_rate_pct descending.
+   Checks: Confirm that rates are consistent with counts (e.g. a service with fewer rows
+   but more errors can have a higher rate than one with more rows but fewer errors).
    ```
 
-10. **Follow-up prompt:**
-    ```
-    Using pandas, find all rows where log_level IN ('ERROR', 'FATAL')
-    AND response_time_ms is not null, ordered by response_time_ms descending.
-    Does the service with the most failures also have the highest response times?
-    Does this confirm or contradict your original hypothesis from the code review?
-    ```
+   **Read the output.** Which service has the highest failure rate? Note whether the top two services are within 5 percentage points of each other — that matters for your recommendation. Write down the rate and base-n before moving to Prompt 2.
+
+   > **Follow-up (if top two services are within 5%):** Ask Copilot: *"Filter outputs/rca_app_logs_clean.csv to prod environment only (182 rows). Recalculate failure rate per service for prod. Does the ranking change?"* — staging has a structurally higher failure rate than prod; if the ranking shifts when scoped to prod, the leading service is the environment-specific suspect.
+
+   **Prompt 2 — "When do failures spike?"**
+
+   > You know WHICH service leads. Now find WHEN failures concentrate — a 2–3 hour spike suggests a scheduled job, session expiry pattern, or batch load. This is the temporal signature of the root cause.
+
+   ```
+   Role: Platform Reliability Analyst investigating failure timing patterns.
+   Input: #outputs/rca_app_logs_clean.csv
+   Task: Using pandas:
+     1. Parse the timestamp column as datetime
+     2. Group ERROR + FATAL rows by hour of day (0–23)
+     3. Print: hour | error_fatal_count for all hours, ordered by count descending
+     4. State in one sentence: which 2–3 hours have the highest failure concentration
+   Constraints: Do not print user_id_masked.
+   Format: Table + one-sentence interpretation.
+   ```
+
+   **Read the output.** Is failure distributed evenly across the day, or concentrated in 2–3 hours? Concentrated timing narrows the root cause — check whether the spike hours align with any pattern you identified in `app_service.py` (e.g. session TTL expiry under load, retry storms, scheduled batch jobs).
+
+   **Prompt 3 — "Does the hypothesis hold?"**
+
+   > You formed a hypothesis in the Pre-Step. Now validate it. The key question: does the service with the highest failure rate also have the slowest average response time? If yes, resource contention (DB pool exhaustion, session TTL) is the likely chain. If no, the failure is logic-driven (exception swallowing, no retries) — fast failures, not slow ones.
+
+   ```
+   Role: Platform Reliability Analyst comparing failure patterns against code defects.
+   Input: #outputs/rca_app_logs_clean.csv
+   Task: Using pandas:
+     1. Calculate average response_time_ms by service_name (exclude all nulls)
+     2. Print: service_name | avg_response_time_ms, ordered descending
+     3. State in one sentence: does the service with the highest failure rate (from Prompt 1)
+        also have the highest average response time?
+     4. State in one sentence: does this confirm or contradict your Pre-Step hypothesis?
+   Constraints: Do not print user_id_masked. Nulls excluded — do not fill with 0.
+   Format: Table + two-sentence interpretation.
+   ```
+
+   **Read the output.** If the highest-failure service also has the highest response time: the evidence points to resource exhaustion — DB pool size 3 or session TTL 30s under concurrent load. If the highest-failure service has *normal* response times: the evidence points to logic failure — exceptions swallowed silently, no retries, no fallback queue.
+
+9. **Review output for:**
+   - [ ] Service failure rate table printed (rate as %, ordered descending, with base-n per service)
+   - [ ] Hourly failure table printed; top 2–3 hours named
+   - [ ] Cross-service avg response_time_ms table printed (nulls excluded, not filled with 0)
+   - [ ] Hypothesis explicitly stated as confirmed or contradicted based on EDA output
+   - [ ] `user_id_masked` absent from all printed output
+
+10. **Document your findings** in `outputs/B_cleaning_decisions.md` as 2–3 plain-English briefing bullets — which service leads and at what rate, when failures cluster, and whether the code review hypothesis was confirmed. Write them as if briefing the Engineering Operations lead right now.
+
+**Bonus (if time permits):**
+- Ask Copilot: *"Compare ERROR+FATAL rate between prod (182 rows) and staging (118 rows) environments. Is the failure rate higher in prod or staging — and what does that suggest about whether the root cause is code-driven or configuration-driven?"* — Staging has a structurally higher failure rate than prod in this dataset; this is a significant finding that the raw service-level view hides.
+- Ask Copilot to generate `scripts/analyze_logs.py` that runs all three analyses in sequence with labeled output — a reproducible record of the exact numbers that informed your Phase 3 charts.
 
 11. **Save your findings** — use this prompt to write structured output to the file:
     ```
@@ -209,11 +272,11 @@ scenarios/sub-lab-B-rca/
 12. **Review output for:**
     - [ ] **Section 1: Data Cleaning Audit Log** present with row reconciliation table
     - [ ] Table shows **Raw Data** count vs. **Final Dataset** count with all exclusion steps
-    - [ ] **Section 2: Evidence-Based Findings** present with numbered headers
+    - [ ] **Section 2: Evidence-Based Findings** present with numbered entries
     - [ ] Each finding follows: **Question | Methodology | Finding | Evidence | Assumptions**
     - [ ] Counts consistent with profiling results
-    - [ ] No `user_id_masked` in printed results
-    - [ ] Pandas results confirm or explicitly contradict the code review hypothesis
+    - [ ] No `user_id_masked` in any output
+    - [ ] Hypothesis stated as confirmed or contradicted with evidence
 
 ---
 
@@ -225,17 +288,19 @@ scenarios/sub-lab-B-rca/
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/visualization-architect` and attach `#data/rca_app_logs_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/visualization-architect` and attach `#outputs/rca_app_logs_clean.csv`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
    **Or use this custom prompt:**
    ```
-   Using data/rca_app_logs_clean.csv, generate scripts/visualize_logs.py with
+   Using outputs/rca_app_logs_clean.csv, generate scripts/visualize_logs.py with
    3 interactive charts using plotly.express:
-   1. ERROR + FATAL count by service_name (horizontal bar chart)
-   2. response_time_ms distribution for the top failing service (histogram)
-   3. ERROR and FATAL log count over time by hour (line chart — parse timestamp first)
+   1. ERROR + FATAL count by service_name (horizontal bar chart, ordered by count descending)
+   2. Average response_time_ms by service_name (horizontal bar chart, ordered by avg response
+      time descending, exclude null response_time_ms — do NOT fill nulls with 0)
+   3. ERROR and FATAL log count over time by hour of day (bar chart — parse timestamp first,
+      group by hour 0-23, ordered by hour ascending)
    Rules: Y-axis starts at 0. No 3D charts. No user_id_masked in any label, axis, or hover.
    All axes labeled with units. All charts titled.
    Combine all 3 charts into a single dashboard file:
@@ -348,7 +413,7 @@ Rules:
 - [ ] `scripts/profile_logs.py` — runs without error; output matches 300-row count
 - [ ] `outputs/B_profile.md` — log dataset profiled, all known quality issues documented
 - [ ] `scripts/clean_logs.py` — runs without error; row counts before/after printed
-- [ ] `scripts/analyze_logs.py` — runs without error; highest-failure service identified with supporting counts
+- [ ] `scripts/analyze_logs.py` — runs without error; failure rate per service calculated; hypothesis confirmed or contradicted
 - [ ] `scripts/visualize_logs.py` — runs without error and generates the dashboard
 - [ ] `outputs/B_cleaning_decisions.md` — every transformation justified; all 5 critique flaws addressed
 - [ ] `outputs/B_dashboard.html` — single dashboard file with summary header and all 3 labeled interactive charts

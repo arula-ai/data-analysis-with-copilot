@@ -53,8 +53,9 @@ Save these to `outputs/` before the debrief:
 | `scripts/clean_logs.py` | Cleaning script — every transformation commented and justified |
 | `outputs/B_cleaning_decisions.md` | How you handled data quality issues in the logs + all 5 critique flaws addressed |
 | `scripts/analyze_logs.py` | Pandas EDA script — error counts by service, response times, highest-failure service identified |
-| `scripts/visualize_logs.py` | Python script that generates 3 interactive charts |
-| `outputs/B_chart_*.html` | 3 interactive HTML charts showing error patterns across services and time |
+| `scripts/visualize_logs.py` | Python script that generates the interactive dashboard |
+| `outputs/B_dashboard.html` | Single interactive dashboard with summary header and all 3 labeled charts |
+| `outputs/B_analysis_report.md` | 6-section structured analysis report for Engineering Operations lead |
 
 ---
 
