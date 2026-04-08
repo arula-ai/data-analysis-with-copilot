@@ -20,10 +20,10 @@
 Before starting the lab, ensure all required dependencies are installed by running the following command in your terminal:
 
 ```
-pip install -r requirements.txt
+python -m pip install --proxy http://proxy.fmr.com:8000 -r requirements.txt
 ```
 
-This installs all packages needed for data analysis, visualization, and reporting across all scenarios.
+This installs all packages needed for data analysis, visualization, and reporting across all scenarios using the enterprise proxy route.
 
 ### Required VS Code Extensions
 
