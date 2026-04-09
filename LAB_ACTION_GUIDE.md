@@ -17,10 +17,12 @@
 
 ## Prerequisites Installation
 
-Before starting the lab, ensure all required dependencies are installed by running the following command in your terminal:
+Before starting the lab, ensure all required dependencies are installed by running the following commands in your terminal:
 
 ```
-python -m pip install --proxy http://proxy.fmr.com:8000 -r requirements.txt
+py -m ensurepip --upgrade
+pip install --upgrade pip
+pip install pandas numpy plotly openpyxl --index https://artifactory.fmr.com/api/pypi/pypi-releases/simple
 ```
 
 This installs all packages needed for data analysis, visualization, and reporting across all scenarios using the enterprise proxy route.
