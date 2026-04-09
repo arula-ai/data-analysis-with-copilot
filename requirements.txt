@@ -5,3 +5,12 @@ pandas>=1.5.0
 numpy>=1.21.0
 openpyxl>=3.0.0
 plotly>=5.0.0
+
+
+###
+C:\> py -m ensurepip –upgrade
+C:\> pip install --upgrade pip
+C:\> pip install pandas --index https://artifactory.fmr.com/api/pypi/pypi-releases/simple
+C:\> pip install numpy --index https://artifactory.fmr.com/api/pypi/pypi-releases/simple
+C:\> pip install plotly --index https://artifactory.fmr.com/api/pypi/pypi-releases/simple
+###
