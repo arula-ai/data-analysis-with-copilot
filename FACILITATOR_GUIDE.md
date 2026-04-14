@@ -12,12 +12,12 @@
 | Recommended group size | 8–20 participants |
 | Format | 30-min shared demo + 50-min scenario sprint (individual) + 10-min group debrief |
 | Room setup | Individual workstations, VS Code installed, Python environment ready |
-| Pre-session checks | Verify all participants have Copilot Chat enabled and the enterprise install sequence completed (`ensurepip`, `pip` upgrade, and `pip install pandas numpy plotly openpyxl --index-url ...`) |
-| Scenarios | 3 equal sub-labs — A (Treasury), B (RCA), C (Modernization). Participants choose 1. |
+| Pre-session checks | Verify all participants have Copilot Chat enabled and the enterprise install sequence completed (`ensurepip`, `pip` upgrade, and `pip install pandas numpy plotly openpyxl --index ...`). Run `python scripts/verify_lab_contracts.py` to confirm the environment is fully operational. |
+| Scenarios | 3 sub-labs — A (Treasury), B (RCA), C (Modernization). Participants choose 1. A and B are the standard session. |
 
-**Rotation model:** This lab runs 4x/month. Each session the facilitator fully demos 1 scenario. Participants build fluency across all 3 by attending multiple sessions or choosing the scenario most relevant to their role.
+**Rotation model:** This lab runs multiple times/month. Each session the facilitator fully demos 1 scenario. Participants build fluency by attending multiple sessions or choosing their relevant path.
 
-**Pre-session reminder:** Each scenario dataset contains intentional data quality issues. Do not fix them. Do not hint that they exist until the debrief. Participants are expected to discover them through profiling.
+**Pre-session logic:** Each scenario dataset contains intentional data quality issues. Do not fix them beforehand. Participants are expected to discover them through profiling.
 
 ---
 
@@ -31,22 +31,32 @@ Walk participants through:
 - Opening the repo in VS Code
 - `VERIFY_BEFORE_SEND.md` — read it aloud; establish that this applies before every prompt
 - `QUICK_START.md` — point to it for anyone new to Copilot Chat
-- Agent Selector Dropdown — verify all 6 agents visible. The 4 primary agents (Data Profiling Analyst, Data Cleaning Engineer, Exploratory Data Analyst, Visualization Architect) are used in every scenario sprint. The 2 optional agents (Data Risk Reviewer, Responsible Use Auditor) are available for advanced participants or as optional governance extensions — see Section 7 for guidance.
+- Agent Selector Dropdown — verify all **7 agents** are visible.
+  1. `data-profiling-analyst`
+  2. `data-cleaning-engineer`
+  3. `exploratory-data-analyst`
+  4. `visualization-architect`
+  5. `data-risk-reviewer`
+  6. `responsible-use-auditor`
+  7. `report-writer` (used for final synthesis)
+- Slash commands: Type `/` after selecting an agent to see commands like `/data-profiling` or `/data-cleaning`.
+> **⚠ WATCH FOR:** Do not browse the `/` list. Select your agent from the dropdown FIRST, then type the command directly. Selecting built-in commands like `/tests` by mistake will cause errors.
 - Folder layout: `scenarios/`, `reference/`, `templates/`, `outputs/`, `.github/agents/`
 
 ### 2b. RIFCC-DA Framework (5 min)
 
-Open `reference/PROMPT_PATTERN.md` and walk through the 5 components:
+Open `reference/PROMPT_PATTERN.md` and walk through the **6 components**:
 
 | Component | Explain as |
 |---|---|
 | Role | "Who Copilot should pretend to be" |
-| Inputs | "Which files you're handing it" |
-| Format | "How you want the answer structured" |
-| Constraints | "What it must NOT do" |
+| Inputs | "Which files you're handing it (use #)" |
+| Format | "How you want the answer structured (file path, markdown)" |
+| Constraints | "What it must NOT do (no PII, specific libraries)" |
 | Checks | "What to verify before answering" |
+| Data-specific Assumptions | "How to handle sentinels (999, -1), nulls, and business logic" |
 
-> **Facilitator tip:** Emphasise that domain context — business rules, valid ranges, known issues — travels in the **Inputs** field via the schema file attachment. Participants sometimes want a 6th "Domain" field; redirect them to pack that context into `I` using `#schema.md`.
+> **Facilitator tip:** Emphasise that domain context — business rules, valid ranges, known issues — travels in the **Inputs** field via the schema file attachment and the **Data Assumptions** field.
 
 Show one full example prompt using the `/` picker and explain the `#filename` attachment pattern.
 
@@ -54,21 +64,20 @@ Show one full example prompt using the `/` picker and explain the `#filename` at
 
 Walk through `reference/responsible_use.md`. Key points to emphasize:
 - Synthetic data here — but the same rules apply to real data
-- PII-adjacent fields exist in each dataset — never in charts, exports, or print output
+- PII-adjacent fields exist in each dataset — never in charts, exports, or print output (`counterparty_masked` in Sub-Lab A, `user_id_masked` in Sub-Lab B)
 - Data classification: Internal — do not paste rows into external AI tools or share outside the session
 - Every transformation decision requires written justification — "Copilot said so" is not acceptable
 
 ### 2d. First Agent Demo (15 min)
 
-**Choose one scenario dataset to demo live.** The recommended default is Sub-Lab A (treasury_payments.xlsx) because it has the most issues (11) and no code pre-step — it demonstrates pure data analysis cleanly. Use Sub-Lab B if your audience is engineering-heavy.
+**Choose one scenario dataset to demo live.** The recommended default is Sub-Lab A (treasury_payments.xlsx). Use Sub-Lab B if your audience is engineering-heavy.
 
 1. Discuss the business questions using Copilot.
-2. Run the imports cell and data load cell — show the dataset is real and loads correctly
-3. Select **Data Profiling Analyst** from the Agent Selector Dropdown
-4. Enter a profiling prompt live using `/data-profiling` + `#filename`
-5. Show how to evaluate the output: run the code, check the actual numbers vs. Copilot's claims
-6. Show one follow-up prompt asking Copilot to identify issues
-7. Point to the matching SUB_LAB_GUIDE.md stage — "this is what you'll do for 50 minutes"
+2. Run the dependencies: `python scripts/install_dependencies.py`.
+3. Select **Data Profiling Analyst** from the Agent Selector Dropdown.
+4. Enter `/data-profiling` + `#data/treasury_payments.xlsx` + `#data/treasury_schema.md`.
+5. Show how to evaluate the output: "Insert into New File", save as `scripts/profile_treasury.py`, run it in terminal, check the actual numbers vs. Copilot's claims.
+6. Point to the matching `SUB_LAB_GUIDE.md` stage.
 
 ---
 
@@ -79,7 +88,7 @@ Walk through `reference/responsible_use.md`. Key points to emphasize:
 **Dataset:** 500 rows, 14 columns
 **Schema:** `data/treasury_schema.md`
 
-**No pre-step** — pure data analysis, no codebase review.
+**No pre-step** — pure data analysis.
 
 **PII-adjacent field:** `counterparty_masked` — never in any chart, print, or export.
 
@@ -91,13 +100,13 @@ Walk through `reference/responsible_use.md`. Key points to emphasize:
 | "TRF" instead of "Wire Transfer" | `payment_type` | 23 | `df['payment_type'].value_counts()` |
 | Negative payment_amount | `payment_amount` | 8 | `(df['payment_amount'] < 0).sum()` |
 | Null payment_amount | `payment_amount` | 15 | `df.isnull().sum()` |
-| Sentinel 999 in prior_alerts_90d | `prior_alerts_90d` | 6 | `df[df['prior_alerts_90d'] > 20]` |
+| Sentinel 999 in prior_alerts_90d | `prior_alerts_90d` | 6 | `df[df['prior_alerts_90d'] == 999]` |
 | Null days_since_last_payment | `days_since_last_payment` | 34 | `df.isnull().sum()` |
 | risk_score > 1.0 | `risk_score` | 11 | `df[df['risk_score'] > 1.0]` |
-| analyst_confidence = -1 | `analyst_confidence` | 19 | `df['analyst_confidence'].value_counts()` |
-| anomaly_confirmed = 2 | `anomaly_confirmed` | 4 | `df['anomaly_confirmed'].value_counts()` |
+| analyst_confidence = -1 | `analyst_confidence` | 19 | `(df['analyst_confidence'] == -1).sum()` |
+| anomaly_confirmed = 2 | `anomaly_confirmed` | 4 | `(df['anomaly_confirmed'] == 2).sum()` |
 | Blank review_status | `review_status` | 7 | `df['review_status'].isnull().sum()` |
-| Mixed date formats | `payment_date` | 5 | `pd.to_datetime(..., errors='coerce').isnull().sum()` |
+| Mixed date formats | `payment_date` | 5 | Five rows use MM/DD/YYYY instead of YYYY-MM-DD. `pd.to_datetime(..., errors='coerce').isnull().sum()` flags them. |
 
 **Key constraints:**
 - Exclude `anomaly_confirmed = 2` from all rate calculations
