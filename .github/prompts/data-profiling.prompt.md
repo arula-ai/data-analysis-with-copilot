@@ -1,6 +1,6 @@
 ---
 mode: 'agent'
-description: 'Generate a pandas profiling script, save it to scripts/profile_[scenario].py, run it, and save the quality summary to outputs/[X]_profile.md.'
+description: 'Generate a pandas profiling script for Scenario A/B/C, save to the mapped script path, run it, and save the matching A_profile.md, B_profile.md, or C_profile.md handoff.'
 ---
 
 ## Role
@@ -11,10 +11,14 @@ You are a Data Profiling Analyst. Generate a readable, well-commented pandas pro
 - Schema provides column definitions, valid ranges, and known issues.
 
 ## Format
-1. Write the profiling script to `scripts/profile_[scenario].py` (e.g., `scripts/profile_treasury.py`, `scripts/profile_logs.py`, `scripts/profile_mainframe.py`). The script must end with a block that writes the quality summary to `outputs/[X]_profile.md` using Python’s `open()` — so running the script once produces both the terminal output and the saved handoff file.
-2. Run the script immediately after saving: `python scripts/profile_[scenario].py`
+1. Determine scenario first, then use this exact mapping:
+   - Scenario A (Treasury): `scripts/profile_treasury.py` -> `outputs/A_profile.md`
+   - Scenario B (RCA): `scripts/profile_logs.py` -> `outputs/B_profile.md`
+   - Scenario C (Modernization): `scripts/profile_mainframe.py` -> `outputs/C_profile.md`
+   The script must end with a block that writes the quality summary to the mapped output file using Python `open()`.
+2. Run the script immediately after saving with the matching filename (for example: `python scripts/profile_logs.py` for Scenario B).
 3. Numbered data quality issues log: Issue # | Column | Description | Count | Severity (Low / Medium / High)
-4. The saved `outputs/[X]_profile.md` is the handoff to Phase 2 — attach it by name in the next prompt
+4. The saved scenario-specific profile file (`outputs/A_profile.md`, `outputs/B_profile.md`, or `outputs/C_profile.md`) is the handoff to Phase 2 — attach the exact file by name in the next prompt.
 
 ## Constraints
 - Do not mutate the original dataframe — profiling is read-only
@@ -29,4 +33,4 @@ You are a Data Profiling Analyst. Generate a readable, well-commented pandas pro
 - [ ] Are value distributions provided for all categorical columns?
 - [ ] Are descriptive statistics provided for all numeric columns?
 - [ ] Are schema violations flagged (values outside valid ranges)?
-- [ ] Is the output saved to the correct file path?
+- [ ] Is the output saved to the exact scenario-mapped file path (A/B/C)?

@@ -84,5 +84,5 @@ Document your findings in a markdown file in `outputs/` — name it `[X]_governa
 
 Share your completed `outputs/` folder (or the specific deliverables) with your facilitator or team lead. At minimum, aim for:
 
-- [ ] All 3 required deliverables for at least one additional scenario (`[X]_profile.md`, `[X]_cleaning_decisions.md`, `[X]_chart_*.html`)
+- [ ] All 3 required deliverables for at least one additional scenario (`[X]_profile.md`, `[X]_cleaning_decisions.md`, `[X]_dashboard.html`)
 - [ ] Exercise 2: Flawed analysis critique notes

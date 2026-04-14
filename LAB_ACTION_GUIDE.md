@@ -21,16 +21,28 @@ Before starting the lab, ensure all required dependencies are installed by runni
 
 ```
 py -m ensurepip --upgrade
-pip install --upgrade pip
-pip install pandas numpy plotly openpyxl --index https://artifactory.fmr.com/api/pypi/pypi-releases/simple
+python -m pip install --upgrade pip
+python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple
 ```
 
-This installs all packages needed for data analysis, visualization, and reporting across all scenarios using the enterprise proxy route.
+This installs all packages needed for data analysis, visualization, and reporting across all scenarios from the enterprise package source.
 
-**Facilitator Setup:** Facilitators can use this to install dependencies:
+### Canonical Verification Entrypoint
+
+Run the lab contract verification script from the repo root before facilitation or closeout:
 
 ```
-pip install -r requirements.txt
+python scripts/verify_lab_contracts.py
+```
+
+This checks required files/folders, scenario documentation presence, prompt/agent presence, and A/B/C output naming contracts.
+
+**Facilitator Setup:** Facilitators can use this same sequence to install dependencies:
+
+```
+py -m ensurepip --upgrade
+python -m pip install --upgrade pip
+python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple
 ```
 
 ### Required VS Code Extensions
@@ -115,7 +127,8 @@ Type `/` in Copilot Chat to see all available slash commands:
 | `/data-visualization` | Visualization Architect | Build 3 labeled interactive charts and export as HTML |
 | `/data-risk-review` | Data Risk Reviewer | Classify every column by sensitivity tier, flag PII-adjacent fields |
 | `/responsible-use-audit` | Responsible Use Auditor | Audit all scripts and outputs for policy compliance |
-| `/eda-analysis` | Exploratory Data Analyst | Run all Phase 2B treasury EDA analyses in one shot and write briefing bullets to `outputs/A_cleaning_decisions.md` |
+| `/eda-analysis` | Exploratory Data Analyst | Run all Phase 2B treasury EDA analyses in one shot and write briefing bullets to `outputs/A_eda_findings.md` |
+| `/rca-analysis` | Exploratory Data Analyst | Run all Phase 2B RCA analyses in one shot and write briefing bullets to `outputs/B_cleaning_decisions.md` |
 
 > **Attaching files:** Use `#filename` syntax in your prompt to attach any file from your workspace. Always attach both the dataset and the schema — Copilot uses the schema to understand column definitions and generate more accurate code.
 
@@ -138,7 +151,7 @@ Type `/` in Copilot Chat to see all available slash commands:
 - [ ] Confirm `outputs/` and `scripts/` directories exist at the repo root (scripts save there — if missing, create them before starting)
 - [ ] Verify `.github/agents/` folder is present — agents must appear in the dropdown
 - [ ] Verify `.github/prompts/` folder is present — all 6 slash commands must appear with `/`
-- [ ] Verify `openpyxl` is installed: `pip install openpyxl` (required for Scenarios A and C)
+- [ ] Verify `openpyxl` is installed (required for Scenarios A and C) as part of the enterprise install sequence above
 
 ### For Participants
 
@@ -186,9 +199,21 @@ Type `/` in Copilot Chat to see all available slash commands:
 
 > This is the core skill of the lab. Every Phase 1–3 prompt you write should be at "Precise" quality before you run any generated code.
 
+### Three Complete Prompt Examples (with expected outputs)
+
+Use these as copy-ready, end-to-end examples — one per required phase.
+
+| Phase | Prompt Example | Expected Output |
+|---|---|---|
+| **Phase 1 — Profiling** | `"Role: Data Profiling Analyst. Inputs: #data/treasury_payments.xlsx and #data/treasury_schema.md. Format: write scripts/profile_treasury.py and run it; save summary to outputs/A_profile.md. Constraints: pandas only, read-only profiling, no counterparty_masked values in output. Checks: null count and % for every column, sentinel values flagged separately, schema-range violations listed."` | `outputs/A_profile.md` |
+| **Phase 2 — Cleaning + EDA** | `"Role: Data Cleaning Engineer. Inputs: #data/treasury_payments.xlsx and #outputs/A_profile.md. Format: write scripts/clean_treasury.py and run it; save cleaned data to outputs/treasury_payments_clean.csv; create or update outputs/A_eda_findings.md with 2-3 briefing bullets from the exploratory analysis. Constraints: pandas only, inline justification comments, row counts before/after every major step, no counterparty_masked output. Checks: anomaly_confirmed=2 handled explicitly, 999/-1 sentinel handling documented."` | `outputs/A_eda_findings.md` |
+| **Phase 3 — Visualization** | `"Role: Visualization Architect. Input: #outputs/treasury_payments_clean.csv. Format: write scripts/visualize_treasury.py and run it; generate one self-contained dashboard outputs/A_dashboard.html with 3 labeled Plotly charts and summary header. Constraints: exclude sentinel values and counterparty_masked, no 3D charts, zero-baseline for bar/line charts. Checks: labeled axes/units, dashboard opens locally with all 3 charts."` | `outputs/A_dashboard.html` |
+
 ---
 
 ## Scenario Sprint — Choose Your Sub-Lab
+
+> **Stage 4 (Final Analysis Report) is optional** and intended for post-lab follow-up or homework. The in-session 90-minute completion contract is Stage 0 + Pre-step (B/C) + Phases 1–3 + Debrief.
 
 Pick one scenario and open its guide. All phase content, prompts, checklists, and debrief questions live in the sub-lab guide.
 
@@ -287,11 +312,11 @@ The facilitator will ask:
 | Slash command `/` not showing prompts | Verify `.github/prompts/` folder exists with `.prompt.md` files |
 | Copilot Chat responds with "To generate tests, open a file and select code to test" | You accidentally selected the built-in `/tests` command — use the Agent dropdown to select the agent first, then type your prompt without browsing `/` commands |
 | Copilot Chat not opening | Check extension status bar — sign out and back into GitHub |
-| `import pandas` fails | Run `pip install -r requirements.txt` in terminal |
-| `import plotly` error | Run `pip install -r requirements.txt` — required for all Phase 3 charts |
+| `import pandas` fails | Re-run the enterprise install sequence in this guide (`ensurepip` + `pip upgrade` + `pip install pandas numpy plotly openpyxl --index-url ...`) |
+| `import plotly` error | Re-run the enterprise install sequence — Plotly is required for all Phase 3 charts |
 | HTML file not opening | Right-click → Open With → Browser. No server needed. |
 | Hover tooltip shows PII field | Drop the column before passing to Plotly: `df.drop(columns=['counterparty_masked'])` |
-| `import openpyxl` error | Run `pip install -r requirements.txt` — required for Scenarios A and C |
+| `import openpyxl` error | Re-run the enterprise install sequence — `openpyxl` is required for Scenarios A and C |
 | Excel file not loading | Confirm you are using `pd.read_excel('data/filename.xlsx')` from the workspace root |
 | Script fails with FileNotFoundError | Run scripts from the workspace root, not from inside a subfolder |
 | Output too generic | Attach files explicitly with `#filename` — do not rely on Copilot's general knowledge |

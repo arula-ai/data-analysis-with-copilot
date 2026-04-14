@@ -48,7 +48,7 @@ Save these to `outputs/` before the debrief:
 | `outputs/C_cleaning_decisions.md` | How you handled data quality issues + all 5 critique flaws addressed |
 | `scripts/analyze_mainframe.py` | Pandas EDA script — legacy counts by team, top features by usage, high-priority modernization candidates |
 | `scripts/visualize_mainframe.py` | Python script that generates 3 interactive charts |
-| `outputs/C_chart_*.html` | 3 interactive HTML charts showing usage patterns and modernization priorities |
+| `outputs/C_dashboard.html` | Single interactive dashboard with summary header and 3 labeled charts showing usage patterns and modernization priorities |
 
 ---
 
@@ -56,7 +56,9 @@ Save these to `outputs/` before the debrief:
 
 This scenario uses an Excel file. Ensure `openpyxl` is installed:
 ```
-pip install openpyxl
+py -m ensurepip --upgrade
+python -m pip install --upgrade pip
+python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple
 ```
 Load the data with: `pd.read_excel('data/mainframe_usage.xlsx')`
 

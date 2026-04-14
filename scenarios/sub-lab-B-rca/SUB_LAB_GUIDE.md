@@ -17,7 +17,7 @@
 | **Phase 1** | 10 min | Profile the log dataset — find all quality issues |
 | **Phase 2** | 25 min | Critique the flawed analysis, clean the data, run exploratory analysis |
 | **Phase 3** | 15 min | Build the visualization dashboard |
-| **Stage 4** | 8 min | Write the final analysis report |
+| **Stage 4 (Optional)** | 8 min | Write the final analysis report (post-lab extension) |
 
 ---
 
@@ -274,6 +274,8 @@ scenarios/sub-lab-B-rca/
 
 11. **Document your findings** in `outputs/B_cleaning_decisions.md` as 2–3 plain-English briefing bullets — which service leads and at what rate, whether response time implicates resource exhaustion, and which error codes confirm or contradict the code review hypothesis. Write them as if briefing the Engineering Operations lead right now.
 
+> `outputs/B_cleaning_decisions.md` is your handoff to Phase 3 — attach it with your cleaned dataset (`#outputs/rca_app_logs_clean.csv`) in the visualization prompt.
+
 **Bonus (if time permits):**
 - Ask Copilot: *"For ERR_001 rows (AuthService session expiry): what is the average response_time_ms compared to ERR_DB_001 rows (DB pool exhaustion)? Which defect is producing the slower failures?"* — This distinguishes between an auth bottleneck and a DB bottleneck, which have different remediation paths.
 - Ask Copilot to generate `scripts/analyze_logs.py` that runs all three analyses in sequence with labeled output — a reproducible record of the exact numbers that informed your Phase 3 charts.
@@ -349,13 +351,15 @@ scenarios/sub-lab-B-rca/
    | Format | How | When to Use |
    |--------|-----|-------------|
    | **Interactive HTML** | Attach `outputs/B_dashboard.html` directly | Teams, email, internal review — opens in any browser, no install needed |
-   | **Screenshot** | `Windows + Shift + S` over the open dashboard | Quick Teams/Slack paste |
+    | **Screenshot** | `Windows + Shift + S` over the open dashboard | Quick Teams/Slack paste |
 
-   > **Before sharing:** Run the `VERIFY_BEFORE_SEND.md` checklist. Confirm `user_id_masked` is not visible in any label, axis, or hover tooltip.
+    > **Before sharing:** Run the `VERIFY_BEFORE_SEND.md` checklist. Confirm `user_id_masked` is not visible in any label, axis, or hover tooltip.
+
+> `outputs/B_dashboard.html` is your handoff to debrief. Bring one finding, one risk, and one correction you made.
 
 ---
 
-## Stage 4 — Final Analysis Report (8 min)
+## Stage 4 (Optional) — Final Analysis Report (8 min, post-lab extension)
 
 **Goal:** Synthesize findings from all prior stages into a structured written deliverable for the Engineering Operations lead.
 
@@ -413,7 +417,7 @@ Rules:
 2. Check **Section 5** — must name a specific service, not a general failure category
 3. Save the output to `outputs/B_analysis_report.md`
 
-### 4.3 — Stage 4 Review Checklist
+### 4.3 — Stage 4 Optional Review Checklist
 
 - [ ] `outputs/B_analysis_report.md` created
 - [ ] Executive Summary is 2–3 sentences with no field names
@@ -432,11 +436,11 @@ Rules:
 - [ ] `scripts/clean_logs.py` — runs without error; row counts before/after printed
 - [ ] `scripts/analyze_logs.py` — runs without error; failure rate per service calculated; hypothesis confirmed or contradicted
 - [ ] `scripts/visualize_logs.py` — runs without error and generates the dashboard
-- [ ] `outputs/B_cleaning_decisions.md` — every transformation justified; all 5 critique flaws addressed
+- [ ] `outputs/B_cleaning_decisions.md` — 2–3 plain-English RCA EDA briefing bullets (service leader/rate, response-time implication, error-code hypothesis closure)
 - [ ] `outputs/B_dashboard.html` — single dashboard file with summary header and all 3 labeled interactive charts
 - [ ] Pandas analysis ran; highest-failure service confirmed or contradicted by data
 - [ ] No `user_id_masked` visible in any output, chart, or printed DataFrame
-- [ ] `outputs/B_analysis_report.md` — 6-section structured report; Section 3 figures sourced from EDA outputs
+- [ ] `outputs/B_analysis_report.md` — 6-section structured report; Section 3 figures sourced from EDA outputs *(optional extension deliverable)*
 
 ---
 

@@ -17,7 +17,7 @@
 | **Phase 1** | 10 min | Profile the usage dataset — find all quality issues |
 | **Phase 2** | 25 min | Critique the flawed analysis, clean the data, run exploratory analysis |
 | **Phase 3** | 15 min | Build the visualization dashboard |
-| **Stage 4** | 8 min | Write the final analysis report |
+| **Stage 4 (Optional)** | 8 min | Write the final analysis report (post-lab extension) |
 
 ---
 
@@ -147,7 +147,7 @@ scenarios/sub-lab-C-modernization/
    (use pd.read_excel), avoiding all the flaws identified above. Every transformation must
    have an inline comment explaining the business justification. Print row count before
    cleaning, after each major step, and at the end. Save cleaned data to
-   data/mainframe_usage_clean.csv. pandas only. Do not overwrite the original xlsx.
+   outputs/mainframe_usage_clean.csv. pandas only. Do not overwrite the original xlsx.
    Write the script to scripts/clean_mainframe.py and run it.
    ```
 
@@ -178,7 +178,7 @@ scenarios/sub-lab-C-modernization/
 
 10. **Custom prompt:**
     ```
-    Using data/mainframe_usage_clean.csv, generate a pandas script (scripts/analyze_mainframe.py):
+    Using outputs/mainframe_usage_clean.csv, generate a pandas script (scripts/analyze_mainframe.py):
     - Count of legacy features (legacy_flag = True) grouped by team
     - Top 5 features by monthly_active_users where legacy_flag = True (exclude null users)
     - Features where modernization_priority = 'High' AND estimated_migration_effort_days != 9999,
@@ -208,8 +208,10 @@ scenarios/sub-lab-C-modernization/
 
     Section 2: Evidence-Based Findings
     For each business question answered, one entry with these fields:
-    Business Question | Methodology | Finding | Evidence | Assumptions | Limitations
-    ```
+     Business Question | Methodology | Finding | Evidence | Assumptions | Limitations
+     ```
+
+> `outputs/C_cleaning_decisions.md` is your handoff to Phase 3 — attach it with your cleaned dataset (`#outputs/mainframe_usage_clean.csv`) in the visualization prompt.
 
 13. **Review output for:**
     - [ ] **Section 1: Data Cleaning Audit Log** present with row reconciliation table
@@ -230,13 +232,13 @@ scenarios/sub-lab-C-modernization/
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#data/mainframe_usage_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#outputs/mainframe_usage_clean.csv`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
    **Or use this custom prompt:**
    ```
-   Using data/mainframe_usage_clean.csv, generate scripts/visualize_mainframe.py with
+   Using outputs/mainframe_usage_clean.csv, generate scripts/visualize_mainframe.py with
    3 interactive charts using plotly.express:
    1. Count of legacy vs modern features by team (grouped bar chart)
    2. monthly_active_users distribution for legacy features only (histogram)
@@ -274,13 +276,15 @@ scenarios/sub-lab-C-modernization/
    | Format | How | When to Use |
    |--------|-----|-------------|
    | **Interactive HTML** | Attach `outputs/C_dashboard.html` directly | Teams, email, internal review — opens in any browser, no install needed |
-   | **Screenshot** | `Windows + Shift + S` over the open dashboard | Quick Teams/Slack paste |
+    | **Screenshot** | `Windows + Shift + S` over the open dashboard | Quick Teams/Slack paste |
 
-   > **Before sharing:** Run the `VERIFY_BEFORE_SEND.md` checklist. Confirm no internal identifiers are visible in labels, axes, or hover tooltips.
+    > **Before sharing:** Run the `VERIFY_BEFORE_SEND.md` checklist. Confirm no internal identifiers are visible in labels, axes, or hover tooltips.
+
+> `outputs/C_dashboard.html` is your handoff to debrief. Bring one finding, one risk, and one correction you made.
 
 ---
 
-## Stage 4 — Final Analysis Report (8 min)
+## Stage 4 (Optional) — Final Analysis Report (8 min, post-lab extension)
 
 **Goal:** Synthesize findings from all prior stages into a structured written deliverable for the Engineering Strategy lead.
 
@@ -340,7 +344,7 @@ Rules:
 2. Check **Section 5** — must name specific feature(s) with usage evidence, not general categories
 3. Save the output to `outputs/C_analysis_report.md`
 
-### 4.3 — Stage 4 Review Checklist
+### 4.3 — Stage 4 Optional Review Checklist
 
 - [ ] `outputs/C_analysis_report.md` created
 - [ ] Executive Summary is 2–3 sentences with no field names
@@ -363,7 +367,7 @@ Rules:
 - [ ] `outputs/C_dashboard.html` — single dashboard file with summary header and all 3 labeled interactive charts
 - [ ] Pandas analysis ran and top modernization candidates identified
 - [ ] Sentinel `9999` excluded from all calculations and charts
-- [ ] `outputs/C_analysis_report.md` — 6-section structured report; Section 3 figures sourced from EDA outputs
+- [ ] `outputs/C_analysis_report.md` — 6-section structured report; Section 3 figures sourced from EDA outputs *(optional extension deliverable)*
 
 ---
 

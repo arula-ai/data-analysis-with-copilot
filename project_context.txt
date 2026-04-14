@@ -40,7 +40,7 @@
   - Each contains: `SCENARIO_BRIEF.md`, `SUB_LAB_GUIDE.md`, `exercises/` (flawed analysis + SQL reference + answer key)
 - **`.github/agents/`** — 6 custom Copilot agent mode files (data-profiling-analyst, data-cleaning-engineer, exploratory-data-analyst, visualization-architect, data-risk-reviewer, responsible-use-auditor)
 - **`.github/prompts/`** — 6 named Copilot prompt files (invoked with `/` slash commands)
-- **`outputs/`** — Participant deliverables saved here (profile.md, cleaning_decisions.md, chart_*.html)
+- **`outputs/`** — Participant deliverables saved here (`[X]_profile.md`, `[X]_cleaning_decisions.md`, `[X]_dashboard.html`)
 - **`scripts/`** — Cleaning scripts generated in Phase 2 (profile_*.py, clean_*.py, visualize_*.py)
 - **`templates/`** — Structured templates for each phase deliverable
 - **`reference/`** — RIFCC-DA framework, responsible use policy, glossary, Copilot commands, notebooks guide

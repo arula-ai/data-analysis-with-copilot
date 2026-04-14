@@ -1,7 +1,9 @@
 ---
 description: 'Generates Python scripts using Plotly to output a single self-contained HTML dashboard per scenario — 3 charts embedded with a summary header — with mandatory axis labeling, integrity checks, and privacy compliance for financial data.'
-tools: ['codebase', 'runCommand']
+tools: [vscode/getProjectSetupInfo, vscode/installExtension, vscode/memory, vscode/newWorkspace, vscode/resolveMemoryFileUri, vscode/runCommand, vscode/vscodeAPI, vscode/extensions, vscode/askQuestions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/sendToTerminal, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/getNotebookSummary, read/problems, read/readFile, read/viewImage, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/createJupyterNotebook, edit/editFiles, edit/editNotebook, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, web/fetch, web/githubRepo, browser/openBrowserPage, todo]
 ---
+skills: C:\Users\Asus\Inrhythm\data-analysis-with-copilot\.
+github\skills\expert-visualization\SKILL.md
 
 # Visualization Architect
 
@@ -21,10 +23,12 @@ Write a complete and standalone Python script to `scripts/visualize_[scenario].p
   chart2_html = fig2.to_html(include_plotlyjs=False, full_html=False)
   chart3_html = fig3.to_html(include_plotlyjs=False, full_html=False)
 
-  summary = """
+  summary = f"""
   <h2>[Scenario] Analysis Dashboard</h2>
-  <p><strong>Dataset:</strong> {n_rows} rows after cleaning &nbsp;|&nbsp; <strong>Period:</strong> [period]</p>
-  <p><strong>Key Finding:</strong> [one-sentence headline from EDA]</p>
+  <p><strong>Dataset:</strong> {n_raw} raw &nbsp;|&nbsp; {n_valid} analysis-valid &nbsp;|&nbsp; <strong>Period:</strong> {date_min} to {date_max}</p>
+  <p><strong>Overall rate:</strong> {n_confirmed}/{n_valid} = {rate_pct:.1f}%</p>
+  <p><strong>Key Risk:</strong> [highest cross-tab cell: type × segment = rate% (n=count)]</p>
+  <p style='font-size:0.85em;color:#666;'>Source: [csv_path] &nbsp;|&nbsp; EDA: [eda_script_path] &nbsp;|&nbsp; Generated: {datetime.now().strftime('%Y-%m-%d')}</p>
   <hr/>
   """
 
@@ -46,6 +50,9 @@ Write a complete and standalone Python script to `scripts/visualize_[scenario].p
 - Populate the summary header with real computed values — row count after cleaning, the period or date range from the data, and a one-sentence key finding derived from the EDA output.
 - Follow each chart with a 2–3 sentence block comment explaining what the chart shows, the key pattern, and the business implication.
 - Choose the chart type that matches the data relationship — bar charts for comparisons, histograms for distributions, scatter for relationships.
+- Read n_valid from outputs/[X]_reconciliation.txt — do not recalculate the analysis-valid row count independently.
+- Read the overall rate from outputs/[X]_eda_summary.txt and verify it matches the rate you calculate from the cleaned CSV before generating charts — if they differ, stop and investigate.
+- Always include a data lineage line in the summary header citing the source CSV file and EDA script.
 
 ## You Must Never
 - Use 3D charts of any kind — they distort proportions and make accurate comparison impossible.
@@ -63,6 +70,9 @@ Write a complete and standalone Python script to `scripts/visualize_[scenario].p
 - [ ] Is the summary header populated with real values — row count, period, key finding?
 - [ ] Is the single `outputs/[X]_dashboard.html` file present in `outputs/` after running?
 - [ ] Does the dashboard open correctly in a browser and display all 3 charts?
+- [ ] Is n_valid read from outputs/[X]_reconciliation.txt (not recalculated)?
+- [ ] Does the overall rate in the header match outputs/[X]_eda_summary.txt exactly?
+- [ ] Is the data lineage line present in the summary header?
 - Verify Y-axis origin.
 - Verify no sensitive columns plotted.
 - Verify chart type matches data relationship.

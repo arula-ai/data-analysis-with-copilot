@@ -12,7 +12,7 @@
 | Recommended group size | 8–20 participants |
 | Format | 30-min shared demo + 50-min scenario sprint (individual) + 10-min group debrief |
 | Room setup | Individual workstations, VS Code installed, Python environment ready |
-| Pre-session checks | Verify all participants have Copilot Chat enabled and `pip install -r requirements.txt` completed |
+| Pre-session checks | Verify all participants have Copilot Chat enabled and the enterprise install sequence completed (`ensurepip`, `pip` upgrade, and `pip install pandas numpy plotly openpyxl --index-url ...`) |
 | Scenarios | 3 equal sub-labs — A (Treasury), B (RCA), C (Modernization). Participants choose 1. |
 
 **Rotation model:** This lab runs 4x/month. Each session the facilitator fully demos 1 scenario. Participants build fluency across all 3 by attending multiple sessions or choosing the scenario most relevant to their role.
@@ -275,8 +275,8 @@ Two additional agents exist in `.github/agents/` that are not part of the standa
 | Copilot Chat not responding | Extension not authenticated or rate limited | Check extension status bar; sign out and back into GitHub account |
 | Copilot doesn't see the file | `#filename` not used — pasted text instead | Retype `#` in chat input and use the file picker dropdown |
 | Script not executing | Python path not configured | `Ctrl+Shift+P` → "Python: Select Interpreter" → choose Python 3.10+ |
-| `import pandas` fails | Not installed in active environment | `pip install -r requirements.txt` |
-| Excel file not loading | `openpyxl` not installed | `pip install openpyxl` then reload kernel |
+| `import pandas` fails | Not installed in active environment | Run enterprise install sequence: `py -m ensurepip --upgrade` → `python -m pip install --upgrade pip` → `python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple` |
+| Excel file not loading | `openpyxl` not installed | Re-run enterprise install sequence, then reload kernel |
 | Agent not in dropdown | `.github/agents/` folder missing or misnamed | Verify `.agent.md` files exist in `.github/agents/` at workspace root |
 | `pd.to_datetime()` fails | Mixed date formats (intentional) | Use `errors='coerce'` — returns NaT for unparseable rows |
 | Script execution error | Path issues | Path `../data/filename` vs `data/filename`... verify working directory |

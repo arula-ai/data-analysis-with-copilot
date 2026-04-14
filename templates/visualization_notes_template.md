@@ -1,11 +1,11 @@
 # Visualization Notes
 **Phase:** 3 | **Agent Mode:** Visualization Architect | **Time Budget:** 15 min
-**Save to:** `outputs/[X]_chart_*.html` *(replace [X] with your scenario letter: A, B, or C)*
+**Save to:** `outputs/[X]_dashboard.html` *(replace [X] with your scenario letter: A, B, or C)*
 
 ---
 
 ## Purpose
-This document records chart design decisions, Copilot corrections, and sharing checklist compliance. One entry per chart produced. Required as the Phase 3 deliverable alongside your exported interactive HTML charts.
+This document records chart design decisions, Copilot corrections, and sharing checklist compliance. One entry per chart produced. Required as the Phase 3 companion document for your exported dashboard.
 
 ---
 
@@ -94,14 +94,14 @@ Your Plotly charts are exported as self-contained interactive HTML. Choose the f
 | **Static PNG** | Open `.html` in Chrome → click Hamburger icon (top-right of chart) → **Download plot as PNG** | Slide decks, email, tools that don't render HTML |
 | **Clipboard screenshot** | `Windows+Shift+S` (Windows) / `Cmd+Shift+4` (Mac) — capture chart area | Quick Teams/Slack/chat sharing |
 | **Notebook embed** | Copy Plotly code into a Jupyter notebook cell → run inline → save `.ipynb` | Reproducible analysis documents |
-| **Reporting pipeline** | Export cleaned `.csv` from `data/` → import into Power BI / Tableau / Looker as data source | Production reporting dashboards |
+| **Reporting pipeline** | Export cleaned `.csv` from `outputs/` → import into Power BI / Tableau / Looker as data source | Production reporting dashboards |
 
 ### Reporting Integration Notes
 
 > Fill in during or after the lab session.
 
 **If connecting to Power BI:**
-- Data source: `data/[scenario]_[clean].csv`
+- Data source: `outputs/[scenario]_[clean].csv`
 - Recommended chart type mapping: bar → Clustered Bar, histogram → Histogram visual, line → Line chart
 
 **If connecting to Tableau:**

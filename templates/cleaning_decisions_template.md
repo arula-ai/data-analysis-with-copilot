@@ -67,21 +67,36 @@ This document records every transformation applied to your scenario dataset. It 
 
 Script: `scripts/clean_[scenario].py`
 
-Cleaned output saved to: `data/[dataset]_clean.csv`
+Cleaned output saved to: `outputs/[dataset]_clean.csv`
 
 Script reviewed line-by-line before execution: [ ] Yes | [ ] No
 
 ---
 
-## Exploratory Pattern Analysis Summary
+## EDA Findings — [Scenario Name] [Period]
 
-> After loading cleaned data into Pandas, record the key findings from your exploratory queries.
+> **Instructions:** Complete this section at the end of Phase 2B. Attach this file with `#outputs/A_eda_findings.md` in your Phase 3 visualization prompt.
 
-| Query | Result Summary |
-|---|---|
-| *(Query description)* | *(Key number or finding)* |
-| | |
-| | |
+**Denominator:** ___ confirmed-valid rows (after excluding anomaly_confirmed = 2 or equivalent sentinel, n=___)
+
+### Finding 1 — Concentration Risk (from EDA Prompt 1)
+[Category dimension 1] × [category dimension 2] shows the highest anomaly/issue rate: ___% (n=___)
+Portfolio average: ___%
+[Note if n<30: "(small sample — interpret with caution)"]
+
+### Finding 2 — Temporal Pattern (from EDA Prompt 2)
+Pattern type: [trend / spike / noise]
+Range: min=___ ([period ___]) to max=___ ([period ___])
+Operational implication: [one sentence — e.g. "spike in week 43 needs root cause" OR "escalating trend needs control tightening"]
+
+### Finding 3 — Geographic / Segment Exposure (from EDA Prompt 3)
+PRIORITY segment: [name] — [count] confirmed anomalies/issues, $[total_exposure] total exposure ([%] of portfolio)
+[If no single PRIORITY segment (top-2 in both count and dollar): document which segment leads on each dimension separately]
+
+### Finding 4 — Model / Score Validation (from EDA Prompt 4)
+Model verdict: [STRONG SIGNAL / WEAK SIGNAL / INVERTED]
+Separation ratio (confirmed vs non-confirmed): [___]
+[If INVERTED: ⚠️ Flag as critical finding — risk model is miscalibrated. Escalate before briefing.]
 
 ---
 

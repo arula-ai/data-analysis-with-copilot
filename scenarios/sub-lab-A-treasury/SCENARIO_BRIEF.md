@@ -50,9 +50,9 @@ Save these to `outputs/` before the debrief:
 |---|---|
 | `outputs/A_profile.md` | Payment dataset profile — row count, null counts, data quality issues |
 | `scripts/clean_treasury.py` | Cleaning script — every transformation commented and justified |
-| `outputs/A_cleaning_decisions.md` | Data quality decisions + 2–3 plain-English findings ready to brief the Head of Operations |
+| `outputs/A_eda_findings.md` | EDA findings — 4 structured analyses ready to brief the Head of Operations |
 | `scripts/visualize_treasury.py` | Python script that generates 3 interactive charts |
-| `outputs/A_chart_*.html` | 3 interactive HTML charts showing anomaly patterns across payment types and time |
+| `outputs/A_dashboard.html` | Single interactive dashboard with summary header and 3 labeled charts showing anomaly patterns across payment types and time |
 
 ---
 
@@ -60,7 +60,9 @@ Save these to `outputs/` before the debrief:
 
 This scenario uses an Excel file. Ensure `openpyxl` is installed:
 ```
-pip install openpyxl
+py -m ensurepip --upgrade
+python -m pip install --upgrade pip
+python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple
 ```
 Load the data with: `pd.read_excel('data/treasury_payments.xlsx')`
 

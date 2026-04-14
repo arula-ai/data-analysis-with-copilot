@@ -2,6 +2,8 @@
 
 **Copilot Data Analysis Lab**
 
+**Status:** Portfolio-ready (validated)
+
 ---
 
 ## Training Overview
@@ -20,13 +22,10 @@
 
 By the end of this lab, participants will be able to:
 
-1. Apply Copilot within VS Code to transform raw datasets into meaningful analytical insights while adhering to company security and privacy policies
-2. Create compelling data visualizations by leveraging Copilot's code generation capabilities to explore and interpret datasets
-3. Evaluate the appropriateness and accuracy of Copilot-generated code for data analysis tasks before implementation
-4. Analyze complex datasets using Copilot assistance to identify patterns, trends, and actionable insights that inform business decisions
-5. Implement responsible-use practices when collaborating with Copilot to ensure all data handling complies with organizational policies
-6. **Governance:** Apply dos and don'ts for following Copilot — understand what data can be connected and used within an IDE
-7. **Quality Controls:** Establish best practices for quality-checking analytics before sharing to ensure accurate storytelling
+1. Apply Copilot in VS Code to profile, clean, and analyze scenario datasets into business-relevant findings.
+2. Generate and validate policy-compliant visualizations from cleaned data, including reproducible self-contained HTML dashboards.
+3. Critically evaluate Copilot-generated code and outputs before use, correcting logic, data quality, and reasoning errors.
+4. Apply responsible-use governance practices (classification, privacy, and verification) before sharing any artifact.
 
 ---
 
@@ -34,8 +33,12 @@ By the end of this lab, participants will be able to:
 
 - VS Code with GitHub Copilot Chat extension installed and authenticated
 - Python 3.10+ installed
-- `pip install -r requirements.txt`
+- Run this enterprise install sequence:
+  - `py -m ensurepip --upgrade`
+  - `python -m pip install --upgrade pip`
+  - `python -m pip install pandas numpy plotly openpyxl --index-url https://artifactory.fmr.com/api/pypi/pypi-releases/simple`
 - Run `python scripts/verify_setup.py` to confirm your environment is ready
+- Run `python scripts/verify_lab_contracts.py` to validate required lab structure and output naming contracts
 - Basic Python familiarity helpful but not required
 - No database setup needed
 
@@ -110,16 +113,18 @@ data/                        ← All datasets and schemas (shared across all sce
 |---|---|---|
 | **Shared Demo** | 0–30 min | Facilitator-led: workspace setup, RIFCC-DA framework, first agent demo |
 | **Scenario Pick** | 30–32 min | You choose Sub-Lab A, B, or C |
-| **Scenario Sprint** | 32–82 min | Work through your chosen sub-lab (3 phases) |
+| **Scenario Sprint** | 32–82 min | Work through your chosen sub-lab (Phases 1–3 required) |
 | **Group Debrief** | 82–90 min | Each group shares 1 finding + 1 risk they caught |
 
 ### Scenario Sprint — 3 Phases (50 min)
+
+> **Stage 4 (Final Analysis Report)** is an optional extension outside the 90-minute core flow. It can be completed after class or as homework and is not required for in-session lab completion.
 
 | Phase | Time | What You Do | Agent |
 |---|---|---|---|
 | **Phase 1** | 10 min | Profile the dataset — find all quality issues | Data Profiling Analyst |
 | **Phase 2** | 25 min | Clean the data + run exploratory analysis with Pandas | Data Cleaning Engineer |
-| **Phase 3** | 15 min | Build 3 labeled charts, export interactive HTML files, run sharing checklist | Visualization Architect |
+| **Phase 3** | 15 min | Build 3 labeled charts and export one self-contained dashboard file | Visualization Architect |
 
 ---
 
@@ -129,7 +134,7 @@ You need 3 artifacts in `outputs/` to complete the lab (prefixed with your scena
 
 - [ ] `[X]_profile.md` — quality issues documented with counts and severity
 - [ ] `[X]_cleaning_decisions.md` — every transformation justified
-- [ ] `[X]_chart_*.html` — 3 labeled interactive charts exported as self-contained HTML files, sharing checklist complete
+- [ ] `[X]_dashboard.html` — one self-contained dashboard file containing 3 labeled interactive charts and summary header
 
 ---
 
@@ -149,7 +154,10 @@ You need 3 artifacts in `outputs/` to complete the lab (prefixed with your scena
 1. Read `VERIFY_BEFORE_SEND.md` — understand what privacy obligations apply before opening any dataset
 2. If new to Copilot Chat, read `QUICK_START.md` — get operational in under 5 minutes
 3. Open `LAB_ACTION_GUIDE.md` — follow it for the full 90-minute session
-4. When the facilitator calls scenario selection, open your chosen `scenarios/sub-lab-[X]/SCENARIO_BRIEF.md`
+4. When the facilitator calls scenario selection, open one of:
+   - `scenarios/sub-lab-A-treasury/SCENARIO_BRIEF.md`
+   - `scenarios/sub-lab-B-rca/SCENARIO_BRIEF.md`
+   - `scenarios/sub-lab-C-modernization/SCENARIO_BRIEF.md`
 
 ---
 
@@ -160,6 +168,12 @@ You need 3 artifacts in `outputs/` to complete the lab (prefixed with your scena
 - Row counts before and after cleaning are mandatory — silent data loss is not acceptable.
 - Sentinel values (999, -1, 9999) must be excluded from all calculations — not treated as real data.
 - "Copilot said so" is not a business justification. Every transformation decision requires written reasoning.
+
+---
+
+## Copyright
+
+© InRhythm. All rights reserved.
 
 ---
 
