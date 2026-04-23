@@ -37,7 +37,7 @@ outputs/                    ← all deliverables go here
 scripts/                    ← your generated scripts go here
 scenarios/sub-lab-A-treasury/
   exercises/
-    flawed_treasury_analysis.md  ← used in Phase 2 Step 1
+    flawed_treasury_analysis.md  ← bonus exercise (see Completion Checklist)
 templates/                  ← copy these to outputs/ for each phase
 reference/                  ← RIFCC-DA framework, policy, glossary
 ```
@@ -82,10 +82,13 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 
 3. **Confirm the script ran** and check terminal output for:
    - [ ] Row count = 500
+   - [ ] Duplicate `payment_id` count reported
    - [ ] Sentinel `999` in `prior_alerts_90d` flagged separately from nulls
    - [ ] Sentinel `-1` in `analyst_confidence` flagged as "not rated" — not a real score
    - [ ] `anomaly_confirmed = 2` flagged as invalid for a binary flag
+   - [ ] Negative `payment_amount` values flagged
    - [ ] Mixed date formats in `payment_date` flagged
+   - [ ] Blank `review_status` values flagged
    - [ ] `counterparty_masked` noted as PII-adjacent
    - [ ] Output saved to `outputs/A_profile.md`
 
@@ -138,7 +141,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
    **Step 3 — Add assertion block:**
    ```
    Add an assertion block at the end of scripts/clean_treasury.py:
-     assert df['anomaly_confirmed'].isin([0, 1, float('nan')]).all(), "Invalid anomaly_confirmed values remain"
+     assert (df['anomaly_confirmed'].isin([0, 1]) | df['anomaly_confirmed'].isna()).all(), "Invalid anomaly_confirmed values remain"
      assert (df['payment_amount'] >= 0).all(), "Negative payment amounts remain"
      assert 999 not in df['prior_alerts_90d'].values, "Sentinel 999 still present in prior_alerts_90d"
      assert -1 not in df['analyst_confidence'].values, "Sentinel -1 still present in analyst_confidence"
@@ -219,9 +222,9 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 
 > **This phase has 4 required analytical questions.** Run them in order — each builds on the previous.
 
-7. Select **Exploratory Data Analyst** from Agent dropdown
+4. Select **Exploratory Data Analyst** from Agent dropdown
 
-8. **Recommended prompt:**
+5. **Recommended prompt:**
    Select **Exploratory Data Analyst** from the Agent dropdown, then type `/eda-analysis` and attach `#outputs/treasury_payments_clean.csv` and `#outputs/A_reconciliation.txt`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
@@ -380,7 +383,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 
    ---
 
-9. **Generate the reproducible EDA script (required):**
+6. **Generate the reproducible EDA script (required):**
 
    After completing all four prompts, ask Copilot:
    ```
@@ -409,7 +412,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 
    > This script is your **reproducible record**. The numbers in your Phase 3 dashboard must match the numbers in this script's output. If they don't match, your charts are not defensible.
 
-10. **Finalize `outputs/A_eda_findings.md` with a header and summary:**
+7. **Finalize `outputs/A_eda_findings.md` with a header and summary:**
 
    Your `outputs/A_eda_findings.md` should now contain all 4 findings captured by Copilot in the steps above. Ask Copilot to add a header and summary paragraph at the top:
    ```
@@ -441,7 +444,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 1. Select **Visualization Architect** from Agent dropdown
 
 2. **Recommended prompt:**
-   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#outputs/treasury_payments_clean.csv`
+   Select **Visualization Architect** from the Agent dropdown, then type `/data-visualization` and attach `#outputs/treasury_payments_clean.csv` and `#outputs/A_eda_findings.md`
 
    > **Tip:** Always use the Agent dropdown first, then type your prompt. Do not type `/` and browse the slash command list — built-in commands like `/tests` appear in the same list and will produce an error if selected by mistake.
 
@@ -532,7 +535,7 @@ reference/                  ← RIFCC-DA framework, policy, glossary
 
 ### 4.1 — Generate the Report
 
-Open Copilot Chat (`Ctrl + Alt + I`). Select the **Report Writer** agent from the dropdown if available — or paste the prompt below directly.
+Open Copilot Chat (`Ctrl+Shift+I` / `Cmd+Shift+I`). Select the **Report Writer** agent from the dropdown if available — or paste the prompt below directly.
 
 **Attach these files before prompting:**
 - `#outputs/A_eda_findings.md`
@@ -603,6 +606,9 @@ Rules:
 - [ ] `outputs/A_profile.md` — dataset profiled, all known quality issues documented
 - [ ] `scripts/clean_treasury.py` — runs without error; row counts before/after printed; all sentinel exclusions documented as inline comments
 - [ ] `outputs/treasury_payments_clean.csv` — created in outputs/ folder
+- [ ] `outputs/A_reconciliation.txt` — reconciliation report created; Final analysis-valid row count confirmed
+- [ ] `scripts/eda_treasury.py` — runs standalone without error; all 4 analyses run in sequence
+- [ ] `outputs/A_eda_summary.txt` — plain-text EDA summary created by eda_treasury.py
 - [ ] `outputs/A_eda_findings.md` — structured 4-finding EDA brief (Concentration Risk, Temporal Pattern, Regional Exposure, Risk Score Validation) with explicit numerator/denominator and base-n evidence
 - [ ] `scripts/visualize_treasury.py` — runs without error and generates the dashboard
 - [ ] `outputs/A_dashboard.html` — single dashboard file with summary header and all 3 labeled interactive charts
